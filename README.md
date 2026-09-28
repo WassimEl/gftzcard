@@ -1,4 +1,4 @@
-# Recueil de poèmes — Pour Zoé
+# Recueil de poèmes
 
 Site statique (aucune installation) : poésie, slam et citations, avec la Gymnopédie n°1 en fond.
 
