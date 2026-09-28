@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pour Zoé</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0c0f24">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🌙%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#0c0f24; --nuit2:#1a1740; --lune:#f4ead6; --brume:#a9a3c7; --rose:#f0a9b8; --or:#ffd98a;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;background:radial-gradient(120% 90% at 50% 0%,var(--nuit2),var(--nuit) 65%);color:var(--lune);font-family:var(--serif);overflow:hidden}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radius:8px}
+
+/* Intro */
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity 1.2s ease,visibility 1.2s;z-index:3}
+#intro.gone{opacity:0;visibility:hidden}
+.lune{width:min(46vw,190px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffaf0,var(--lune) 55%,#d9c9a6);box-shadow:0 0 60px 10px rgba(255,217,138,.35),0 0 180px 60px rgba(240,169,184,.18);animation:flotte 7s ease-in-out infinite;margin-bottom:48px}
+@keyframes flotte{50%{transform:translateY(-14px)}}
+#intro p{color:var(--lune);font-size:clamp(1.6rem,6vw,2.2rem);font-style:italic;font-weight:300;margin:0 0 40px;animation:souffle 2.4s ease-out both;text-shadow:0 0 26px rgba(255,217,138,.4)}
+@keyframes souffle{from{opacity:0;filter:blur(12px);letter-spacing:.25em}to{opacity:1;filter:blur(0);letter-spacing:.02em}}
+#ouvrir{border:1px solid var(--or);border-radius:999px;padding:12px 34px;font-size:1.2rem;color:var(--or);transition:background .3s,color .3s,box-shadow .3s}
+#ouvrir:hover{background:var(--or);color:var(--nuit);box-shadow:0 0 30px rgba(255,217,138,.5)}
+
+/* Bibliothèque */
+#biblio{position:fixed;inset:0;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity 1.4s ease .3s;padding:0 0 90px}
+#biblio.on{opacity:1;visibility:visible}
+#biblio h2{font-weight:300;font-style:italic;text-align:center;color:var(--brume);font-size:1.25rem;margin:30px 0 34px}
+#etagere{max-width:900px;margin:0 auto;padding:0 14px}
+.rang{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:4px;padding:0 14px;margin-bottom:30px;min-height:200px;background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.04));border-radius:4px 4px 0 0}
+.rang::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-14px;height:14px;border-radius:2px;background:linear-gradient(#6a4630,#2c1c12);box-shadow:0 14px 26px rgba(0,0,0,.55)}
+.livre{position:relative;flex:none;display:flex;align-items:center;justify-content:center;border-radius:3px 3px 0 0;
+  background-image:linear-gradient(90deg,rgba(0,0,0,.4),transparent 22%,transparent 78%,rgba(0,0,0,.45));
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.livre::before,.livre::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--bande,var(--or));opacity:.75}
+.livre::before{top:14px}.livre::after{bottom:14px}
+.livre.vrai{cursor:pointer;box-shadow:0 0 22px rgba(255,217,138,.22)}
+.livre.vrai:hover,.livre.vrai:focus-visible{transform:translateY(-16px);box-shadow:0 0 34px rgba(255,217,138,.5)}
+.livre.vrai.sort{transform:translateY(-34px) scale(1.06);box-shadow:0 0 50px rgba(255,217,138,.8)}
+.livre.vrai span{writing-mode:vertical-rl;transform:rotate(180deg);font-style:italic;font-size:1.25rem;color:var(--lune);text-shadow:0 0 12px rgba(0,0,0,.6);padding:24px 0}
+.livre.marque span{padding-top:58px}
+.astre{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-style:normal;font-size:1.1rem;line-height:1;color:var(--or);text-shadow:0 0 8px var(--or),0 0 22px rgba(255,217,138,.85);animation:scint 3.2s ease-in-out infinite}
+@keyframes scint{50%{opacity:.55;transform:translateX(-50%) scale(.82)}}
+.livre.deco{filter:brightness(.42) saturate(.7);pointer-events:none}
+.livre.deco::before,.livre.deco::after{opacity:.35}
+.vide{flex:none}
+.etage{margin-bottom:26px}
+.nomcat{display:flex;align-items:center;gap:14px;margin:10px 0 20px 14px;font-weight:300;font-style:italic;font-size:1.7rem;color:var(--lune)}
+.nomcat::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(244,234,214,.35),transparent)}
+
+/* Lecture */
+#lecture{position:fixed;inset:0;display:flex;flex-direction:column;background:rgba(12,15,36,.93);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s;z-index:4}
+#lecture.on{opacity:1;visibility:visible}
+.haut{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;color:var(--brume);font-style:italic}
+#retour{padding:8px 4px;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
+#retour:hover{border-color:var(--rose);color:var(--rose)}
+#scene{flex:1;overflow-y:auto;display:flex;padding:0 24px}
+#poeme{margin:auto;max-width:34rem;width:100%;padding:24px 0;text-align:center;transition:opacity .35s}
+#poeme.out{opacity:0}
+#poeme h3{font-weight:500;font-style:italic;font-size:clamp(2rem,7vw,3.2rem);margin:0 0 6px;text-shadow:0 0 24px rgba(240,169,184,.4)}
+#poeme .date{color:var(--brume);font-size:1rem;margin-bottom:28px}
+.fleur{display:block;width:70px;height:1px;margin:0 auto 30px;background:linear-gradient(90deg,transparent,var(--rose),transparent)}
+.vers{display:block;font-size:clamp(1.2rem,4.5vw,1.55rem);line-height:1.7;font-weight:300;opacity:0;filter:blur(9px);transform:translateY(8px);animation:encre 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+.vers.blanc{height:1.3rem}
+.citation{margin:0;font-size:clamp(1.55rem,5.6vw,2.3rem);line-height:1.5;font-style:italic;font-weight:300}
+.mot{display:inline-block;margin-right:.05em;opacity:0;filter:blur(9px);transform:translateY(8px);animation:encre 1.3s cubic-bezier(.2,.7,.2,1) forwards}
+.vers.source{font-size:1.05rem;color:var(--brume);font-style:italic;font-weight:300;margin-top:4px}
+.vers.signe{margin-top:30px;font-size:clamp(1.5rem,5vw,1.9rem);font-style:italic;font-weight:500;color:var(--rose);text-shadow:0 0 20px rgba(240,169,184,.55)}
+.vers b{font-weight:500;font-style:italic;color:var(--or);text-shadow:0 0 18px rgba(255,217,138,.7)}
+@keyframes encre{to{opacity:1;filter:blur(0);transform:none}}
+.bas{display:flex;flex-direction:column;align-items:center;gap:14px;padding:12px 24px 26px}
+.fleches{display:flex;gap:34px}
+.fleches button{font-size:2rem;color:var(--brume);padding:4px 14px;transition:color .3s,transform .3s}
+.fleches button:hover:not(:disabled){color:var(--or);transform:scale(1.15)}
+.fleches button:disabled{opacity:.2;cursor:default}
+#points{display:flex;gap:9px}
+#points i{width:6px;height:6px;border-radius:50%;background:var(--brume);opacity:.4;transition:all .4s}
+#points i.a{opacity:1;background:var(--or);box-shadow:0 0 10px var(--or);transform:scale(1.5)}
+
+/* Musique */
+#son{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;border:1px solid rgba(244,234,214,.4);background:rgba(12,15,36,.55);backdrop-filter:blur(6px);display:none;place-items:center;z-index:6}
+#son.on{display:grid}
+#son svg{width:20px;height:20px;fill:var(--lune)}
+#son.joue::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--or);animation:onde 3.2s ease-out infinite}
+@keyframes onde{from{transform:scale(1);opacity:.8}to{transform:scale(1.9);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<section id="intro">
+  <div class="lune"></div>
+  <p>Un recueil</p>
+  <button id="ouvrir">Entrer</button>
+</section>
+
+<main id="biblio">
+  <h2>Pour Zoé</h2>
+  <div id="etagere"></div>
+</main>
+
+<section id="lecture" aria-label="Lecture">
+  <div class="haut"><button id="retour">&#8592; Bibliothèque</button><span id="catnom"></span></div>
+  <div id="scene"><article id="poeme" aria-live="polite"></article></div>
+  <div class="bas">
+    <div class="fleches"><button id="prec" aria-label="Poème précédent">&#8592;</button><button id="suiv" aria-label="Poème suivant">&#8594;</button></div>
+    <div id="points"></div>
+  </div>
+</section>
+
+<button id="son" aria-label="Mettre la musique en pause"></button>
+
+<script src="poems.js"></script>
+
+<script>
+const $ = s => document.querySelector(s);
+const poeme = $("#poeme"), points = $("#points"), etagere = $("#etagere");
+let cur = 0;
+const COULEURS = ["#5b1a2b","#1f3d33","#20305a","#6a4a1c","#3b2a55","#4a2a1f","#24474f"];
+const alea = n => { const x = Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+
+/* ---------- Bibliothèque ---------- */
+const CATEGORIES = {
+  poesie:   { nom:"Poésie",    couleurs:["#5b1a2b","#4a2340","#6b2333"], bande:"#ffd98a", h:190, l:[46,53,60] },
+  slam:     { nom:"Slam",      couleurs:["#173a5e","#1c4a55","#14325a"], bande:"#f0a9b8", h:168, l:[58,66,74] },
+  citation: { nom:"Citations", couleurs:["#6a4a1c","#7d5b2a","#5a4426"], bande:"#f4ead6", h:132, l:[34,40,46] }
+};
+const ORDRE_CAT = ["poesie","slam","citation"];
+const LIVRES = ORDRE_CAT.flatMap(c => POEMES.filter(p => (p.type||"poesie")===c).map(p => Object.assign({}, p, {type:c})));
+
+function construire(){
+  const N = Math.max(4, Math.min(11, Math.floor((Math.min(innerWidth,900)-56)/58)));
+  etagere.innerHTML = "";
+  let gk = 0;
+  ORDRE_CAT.forEach(cat=>{
+    const C = CATEGORIES[cat], liste = LIVRES.filter(p=>p.type===cat);
+    if(!liste.length) return;
+    const bloc = document.createElement("section"); bloc.className = "etage";
+    const t = document.createElement("h3"); t.className = "nomcat"; t.textContent = C.nom; bloc.appendChild(t);
+    const rangs = Math.ceil(liste.length/N);
+    for(let r=0;r<rangs;r++){
+      const rang = document.createElement("div"); rang.className = "rang";
+      for(let j=0;j<N;j++,gk++){
+        const pos = r*N+j, vrai = pos < liste.length;
+        if(!vrai && (!REGLAGES.livresDeco || alea(gk+3)<.35)){
+          if(REGLAGES.livresDeco){ const v = document.createElement("i"); v.className="vide"; v.style.width=(18+alea(gk)*16)+"px"; rang.appendChild(v); }
+          continue;
+        }
+        const l = document.createElement(vrai?"button":"div");
+        l.className = "livre "+(vrai?"vrai":"deco");
+        l.style.setProperty("--bande", C.bande);
+        l.style.width = C.l[Math.floor(alea(gk+1)*3)]+"px";
+        l.style.height = (vrai ? C.h+Math.floor(alea(gk+2)*3)*6 : C.h-10-Math.floor(alea(gk+2)*4)*10)+"px";
+        l.style.backgroundColor = C.couleurs[(vrai?pos:pos+1)%3];
+        if(vrai){
+          const i = LIVRES.indexOf(liste[pos]);
+          l.innerHTML = "<span></span>"; l.firstChild.textContent = liste[pos].titre;
+          if(liste[pos].etoile){ l.classList.add("marque"); l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>'); }
+          l.setAttribute("aria-label","Ouvrir : "+liste[pos].titre+" ("+C.nom+")");
+          l.onclick = ()=>{ l.classList.add("sort"); setTimeout(()=>{ ouvrirLivre(i); l.classList.remove("sort"); },520); };
+        }
+        rang.appendChild(l);
+      }
+      bloc.appendChild(rang);
+    }
+    etagere.appendChild(bloc);
+  });
+}
+let largeur = innerWidth;
+addEventListener("resize",()=>{ if(Math.abs(innerWidth-largeur)>40){ largeur=innerWidth; construire(); } });
+
+/* ---------- Lecture ---------- */
+const esc = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+function rendre(i){
+  const p = LIVRES[i];
+  $("#catnom").textContent = CATEGORIES[p.type].nom;
+  let html, n = 0;
+  if(p.type==="citation"){
+    const mots = p.texte.trim().split(/\s+/);
+    mots[0] = "«\u00a0"+mots[0]; mots[mots.length-1] += "\u00a0»";
+    const corps = mots.map((m,k)=>'<span class="mot" style="animation-delay:'+(0.8+k*0.07)+'s">'+esc(m)+'</span>').join(" ");
+    const t = 1.3 + mots.length*0.07;
+    html = '<i class="fleur"></i><blockquote class="citation">'+corps+'</blockquote>'
+      + '<span class="vers signe" style="animation-delay:'+t+'s">— '+esc(p.auteur||"Auteur inconnu")+'</span>'
+      + (p.source ? '<span class="vers source" style="animation-delay:'+(t+.4)+'s">'+esc(p.source)+'</span>' : '');
+    poeme.className = "cit";
+  } else {
+    const vers = p.texte.split("\n").map(l => l.trim()
+      ? '<span class="vers" style="animation-delay:'+(0.9+(n++)*0.32)+'s">'+esc(l)+'</span>'
+      : '<span class="vers blanc"></span>').join("");
+    const sig = p.auteur || REGLAGES.signature;
+    html = '<h3></h3>'+(p.date?'<div class="date"></div>':'')+'<i class="fleur"></i>'+vers
+      + (sig ? '<span class="vers signe" style="animation-delay:'+(1.6+n*0.32)+'s">— '+esc(sig)+'</span>' : '');
+    poeme.className = "";
+  }
+  poeme.innerHTML = html;
+  if(p.type!=="citation"){
+    poeme.querySelector("h3").textContent = p.titre;
+    if(p.date) poeme.querySelector(".date").textContent = p.date;
+  }
+  document.querySelectorAll("#points i").forEach((d,k)=>d.classList.toggle("a",k===i));
+  $("#prec").disabled = i===0; $("#suiv").disabled = i===LIVRES.length-1;
+  $("#scene").scrollTop = 0;
+  try{ history.replaceState(null,"","#"+(i+1)); }catch(e){}
+}
+function ouvrirLivre(i){ cur=i; rendre(i); $("#lecture").classList.add("on"); }
+function fermer(){
+  $("#lecture").classList.remove("on");
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+}
+function aller(i){
+  if(i<0||i>=LIVRES.length) return;
+  poeme.classList.add("out");
+  setTimeout(()=>{ cur=i; rendre(i); poeme.classList.remove("out"); },350);
+}
+points.innerHTML = LIVRES.map(()=>"<i></i>").join("");
+points.style.display = LIVRES.length>1 ? "flex" : "none";
+$(".fleches").style.display = LIVRES.length>1 ? "flex" : "none";
+$("#prec").onclick = ()=>aller(cur-1);
+$("#suiv").onclick = ()=>aller(cur+1);
+$("#retour").onclick = fermer;
+addEventListener("keydown",e=>{
+  if(!$("#lecture").classList.contains("on")) return;
+  if(e.key==="ArrowRight") aller(cur+1);
+  if(e.key==="ArrowLeft") aller(cur-1);
+  if(e.key==="Escape") fermer();
+});
+let tx=null;
+addEventListener("touchstart",e=>{tx=e.touches[0].clientX},{passive:true});
+addEventListener("touchend",e=>{
+  if(tx===null||!$("#lecture").classList.contains("on")) return;
+  const dx=e.changedTouches[0].clientX-tx; tx=null;
+  if(Math.abs(dx)>60) aller(cur+(dx<0?1:-1));
+},{passive:true});
+
+/* ---------- Musique : Gymnopédie n°1 (Erik Satie, domaine public) ---------- */
+const Musique = (()=>{
+  let ctx, master, timer, nextT=0, bar=0, joue=false;
+  const hz = m => 440*Math.pow(2,(m-69)/12);
+  const B = 0.92;
+  const HARM = [ {bas:43,acc:[59,62,66]}, {bas:43,acc:[59,62,66]}, {bas:38,acc:[57,61,66]}, {bas:38,acc:[57,61,66]} ];
+  const MEL = [ [[78,0,3]], [[81,0,2],[79,2,1]], [[78,0,1],[73,1,1],[71,2,1]], [[73,0,1],[74,1,1],[69,2,1]] ];
+  function note(m,t,d,v){
+    const g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o.type="triangle"; o.frequency.value=hz(m);
+    o2.type="sine"; o2.frequency.value=hz(m)*2; g2.gain.value=.25;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.025);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    o.start(t); o2.start(t); o.stop(t+d+.1); o2.stop(t+d+.1);
+  }
+  function mesure(){
+    const h = HARM[bar%4], t0 = nextT;
+    note(h.bas,t0,B*2.6,.22);
+    h.acc.forEach(m=>{ note(m,t0+B,B*1.9,.07); note(m,t0+2*B,B*1.9,.07); });
+    if(bar>=4) MEL[bar%4].forEach(([m,s,d])=>note(m,t0+s*B,d*B*1.5,.16));
+    nextT += 3*B; bar++;
+  }
+  function init(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value=.85;
+    const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
+    const del = ctx.createDelay(); del.delayTime.value=.34;
+    const fb = ctx.createGain(); fb.gain.value=.38;
+    const wet = ctx.createGain(); wet.gain.value=.4;
+    master.connect(lp); lp.connect(ctx.destination);
+    lp.connect(del); del.connect(fb); fb.connect(del); del.connect(wet); wet.connect(ctx.destination);
+    nextT = ctx.currentTime+.2;
+    timer = setInterval(()=>{ while(nextT < ctx.currentTime+3) mesure(); },400);
+  }
+  let audio=null, mode=null;
+  return {
+    async play(){
+      try{
+        if(mode==="mp3"){ await audio.play(); }
+        else if(mode==="synth"){ await ctx.resume(); }
+        else {
+          try{ audio=new Audio("gymnopedie.mp3"); audio.loop=true; audio.volume=.9; await audio.play(); mode="mp3"; }
+          catch(e){ audio=null; init(); mode="synth"; }
+        }
+        joue = true;
+      }catch(e){ joue=false; }
+      return joue;
+    },
+    async pause(){
+      if(mode==="mp3") audio.pause(); else if(ctx) await ctx.suspend();
+      joue = false; return joue;
+    },
+    get joue(){ return joue; }
+  };
+})();
+
+const son = $("#son");
+const ICON_PAUSE = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
+function majSon(){
+  son.classList.toggle("joue",Musique.joue);
+  son.innerHTML = Musique.joue ? ICON_PAUSE : ICON_PLAY;
+  son.setAttribute("aria-label", Musique.joue ? "Mettre la musique en pause" : "Relancer la musique");
+}
+son.onclick = async()=>{ Musique.joue ? await Musique.pause() : await Musique.play(); majSon(); };
+
+/* ---------- Entrée ---------- */
+$("#ouvrir").onclick = async()=>{
+  await Musique.play();
+  $("#intro").classList.add("gone");
+  construire();
+  $("#biblio").classList.add("on");
+  son.classList.add("on"); majSon();
+  const h = parseInt(location.hash.slice(1),10);
+  if(h>=1 && h<=POEMES.length) setTimeout(()=>ouvrirLivre(h-1),900);
+};
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && Musique.joue){ Musique.pause().then(majSon); } });
+
+/* ---------- Lucioles & étoiles ---------- */
+const cv = $("#fx"), c = cv.getContext("2d");
+let W,H,DPR, mx=-999,my=-999, bugs=[], stars=[];
+const calme = matchMedia("(prefers-reduced-motion:reduce)").matches;
+function taille(){
+  DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  cv.width=W*DPR; cv.height=H*DPR; c.setTransform(DPR,0,0,DPR,0,0);
+  stars = Array.from({length:Math.round(W*H/9000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.2,p:Math.random()*6}));
+  bugs = Array.from({length:calme?12:Math.round(Math.min(70,W*H/16000))},()=>({
+    x:Math.random()*W,y:Math.random()*H,vx:0,vy:0,a:Math.random()*6.28,r:Math.random()*2+1.2,p:Math.random()*6,
+    col:Math.random()<.7?"255,217,138":"240,169,184"}));
+}
+addEventListener("resize",taille); taille();
+addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});
+addEventListener("pointerleave",()=>{mx=my=-999});
+function boucle(t){
+  c.clearRect(0,0,W,H);
+  for(const s of stars){
+    c.fillStyle="rgba(244,234,214,"+(.25+.35*Math.sin(t/1300+s.p))+")";
+    c.beginPath(); c.arc(s.x,s.y,s.r,0,6.283); c.fill();
+  }
+  for(const b of bugs){
+    b.a += (Math.random()-.5)*.25;
+    b.vx += Math.cos(b.a)*.012; b.vy += Math.sin(b.a)*.012-.002;
+    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy);
+    if(d<140){ b.vx+=dx/d*.05; b.vy+=dy/d*.05; }
+    b.vx*=.97; b.vy*=.97; b.x+=b.vx; b.y+=b.vy;
+    if(b.x<-20)b.x=W+20; if(b.x>W+20)b.x=-20; if(b.y<-20)b.y=H+20; if(b.y>H+20)b.y=-20;
+    const l = .35+.65*Math.max(0,Math.sin(t/900+b.p));
+    const g = c.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*9);
+    g.addColorStop(0,"rgba("+b.col+","+(.85*l)+")"); g.addColorStop(1,"rgba("+b.col+",0)");
+    c.fillStyle=g; c.beginPath(); c.arc(b.x,b.y,b.r*9,0,6.283); c.fill();
+  }
+  if(!calme) requestAnimationFrame(boucle);
+}
+requestAnimationFrame(boucle);
+</script>
+</body>
+</html>
