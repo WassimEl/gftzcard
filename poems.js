@@ -4,6 +4,7 @@
    type : "poesie", "slam" ou "citation" (chaque type a son étagère).
    Poème / slam : ligne vide = pause entre strophes, **mot** = mot mis en lumière.
    Citation : ajoute auteur: "..." et source: "..." (facultatif) ; titre = nom sur le dos du livre.
+   nouveau: true → petit bandeau « Nouveau » sur le livre, jusqu'à ce qu'il soit ouvert (retenu dans le navigateur du lecteur).
    ===================================================== */
 const POEMES = [
   {
@@ -40,6 +41,7 @@ Et voilà écrit : **Zoé**`
     type: "poesie",
     etoile: true,   /* ★ dorée sur le dos du livre */
     titre: "J'admire",
+    nouveau: true,   /* bandeau « Nouveau » jusqu'à ce que le texte soit ouvert */
     texte: `Les heures défilent comme des secondes
 À tes yeux, le monde y succombe
 En ta compagnie, tout devient plus simple
