@@ -221,7 +221,7 @@ const REGLAGES = {
   signature: "Wass",
   /* Mot secret révélé quand Zoé touche l'étoile cachée de l'écran d'accueil (\n = retour à la ligne).
      Vide ("") = pas d'étoile. */
-  motSecret: "",
+  motSecret: "T'as trouvé un petit secret, t'es trop forte :D. Gros bisous",
   /* Salutations selon l'heure sur son téléphone : aube 5h-8h, jour 8h-18h, soir 18h-21h, nuit 21h-5h */
   salutations: { aube: "Bon matin, Zoé", jour: "Bonjour Zoé", soir: "Bonsoir Zoé", nuit: "Bonne nuit, Zoé" }
 };
