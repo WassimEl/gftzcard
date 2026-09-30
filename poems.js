@@ -37,6 +37,34 @@ Le temps d'une simple **E**scale
 Et voilà écrit : **Zoé**`
   },
   {
+    type: "poesie",
+    etoile: true,   /* ★ dorée sur le dos du livre */
+    titre: "J'admire",
+    texte: `Les heures défilent comme des secondes
+À tes yeux, le monde y succombe
+En ta compagnie, tout devient plus simple
+Ton sourire, ton regard me poussent à rester humble
+
+Moi je pense que les mots ne suffisent
+Pour définir une aussi belle âme
+Ta rencontre m'est une belle surprise
+Et ta présence me réchauffe comme une flamme
+
+Je savoure chaque instant à tes côtés
+Et avec toi, je me sens léger
+Tu animes chacune de mes journées
+Et grâce à toi, vers l'avant je pointe mon nez
+
+Je conclus sur le plus important
+En te regardant, je me perds
+Ton regard est impressionnant
+Aurais-tu volé les yeux de l'univers ?
+
+Immense est ton cœur
+Mieux qu'une vaste mer
+Et j'y trouve la paix, loin de toute misère`
+  },
+  {
     type: "slam",
     titre: "L'inconnu",
     texte: `J'ai cultivé des fruits de passion et d'amour dans mon jardin de haine
