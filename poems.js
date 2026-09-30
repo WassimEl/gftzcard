@@ -216,4 +216,12 @@ Et c'est du haut de ma canopée que j'observerais, allongé dans mon canapé, qu
 
 /* Réglages : "livresDeco" = false pour n'afficher que tes livres, sans les livres décoratifs.
    "signature" = le nom écrit à la fin de chaque poème ("" pour l'enlever). */
-const REGLAGES = { livresDeco: true, signature: "Wass" };
+const REGLAGES = {
+  livresDeco: true,
+  signature: "Wass",
+  /* Mot secret révélé quand Zoé touche l'étoile cachée de l'écran d'accueil (\n = retour à la ligne).
+     Vide ("") = pas d'étoile. */
+  motSecret: "",
+  /* Salutations selon l'heure sur son téléphone : aube 5h-8h, jour 8h-18h, soir 18h-21h, nuit 21h-5h */
+  salutations: { aube: "Bon matin, Zoé", jour: "Bonjour Zoé", soir: "Bonsoir Zoé", nuit: "Bonne nuit, Zoé" }
+};
