@@ -27,7 +27,8 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 #intro.gone{opacity:0;visibility:hidden}
 .lune{width:min(46vw,190px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffaf0,var(--lune) 55%,#d9c9a6);box-shadow:0 0 60px 10px rgba(255,217,138,.35),0 0 180px 60px rgba(240,169,184,.18);animation:flotte 7s ease-in-out infinite;margin-bottom:48px}
 @keyframes flotte{50%{transform:translateY(-14px)}}
-#intro p{color:var(--lune);font-size:clamp(1.6rem,6vw,2.2rem);font-style:italic;font-weight:300;margin:0 0 40px;animation:souffle 2.4s ease-out both;text-shadow:0 0 26px rgba(255,217,138,.4)}
+#intro p{color:var(--lune);font-size:clamp(1.6rem,6vw,2.2rem);font-style:italic;font-weight:300;margin:0 0 12px;animation:souffle 2.4s ease-out both;text-shadow:0 0 26px rgba(255,217,138,.4)}
+#intro p.dedi{color:var(--rose);font-size:clamp(1.35rem,5vw,1.8rem);margin-bottom:40px;animation-delay:1.5s;text-shadow:0 0 26px rgba(240,169,184,.5)}
 @keyframes souffle{from{opacity:0;filter:blur(12px);letter-spacing:.25em}to{opacity:1;filter:blur(0);letter-spacing:.02em}}
 #ouvrir{border:1px solid var(--or);border-radius:999px;padding:12px 34px;font-size:1.2rem;color:var(--or);transition:background .3s,color .3s,box-shadow .3s}
 #ouvrir:hover{background:var(--or);color:var(--nuit);box-shadow:0 0 30px rgba(255,217,138,.5)}
@@ -102,7 +103,8 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 
 <section id="intro">
   <div class="lune"></div>
-  <p>Un recueil</p>
+  <p>Un recueil.</p>
+  <p class="dedi">Pour toi Zoé.</p>
   <button id="ouvrir">Entrer</button>
 </section>
 
@@ -248,6 +250,8 @@ addEventListener("touchend",e=>{
 /* ---------- Musique : Gymnopédie n°1 (Erik Satie, domaine public) ---------- */
 const Musique = (()=>{
   let ctx, master, timer, nextT=0, bar=0, joue=false;
+  let audio=null, mode=null, viaCtx=false, volId=null;
+  const FADE_IN = 3000, FADE_OUT = 1200;
   const hz = m => 440*Math.pow(2,(m-69)/12);
   const B = 0.92;
   const HARM = [ {bas:43,acc:[59,62,66]}, {bas:43,acc:[59,62,66]}, {bas:38,acc:[57,61,66]}, {bas:38,acc:[57,61,66]} ];
@@ -270,7 +274,7 @@ const Musique = (()=>{
   }
   function init(){
     ctx = new (window.AudioContext||window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value=.85;
+    master = ctx.createGain(); master.gain.value=0;
     const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
     const del = ctx.createDelay(); del.delayTime.value=.34;
     const fb = ctx.createGain(); fb.gain.value=.38;
@@ -280,23 +284,67 @@ const Musique = (()=>{
     nextT = ctx.currentTime+.2;
     timer = setInterval(()=>{ while(nextT < ctx.currentTime+3) mesure(); },400);
   }
-  let audio=null, mode=null;
+
+  /* mp3 : passe par Web Audio pour que le fondu marche aussi sur iPhone (audio.volume y est ignoré) */
+  function lier(){
+    try{
+      ctx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = ctx.createMediaElementSource(audio);
+      master = ctx.createGain(); master.gain.value=0;
+      src.connect(master); master.connect(ctx.destination);
+      viaCtx = true;
+    }catch(e){ viaCtx = false; }
+  }
+
+  /* Fondu de volume */
+  const vmax = () => mode==="mp3" ? .9 : .85;
+  const lire = () => (mode==="mp3" && !viaCtx) ? audio.volume : master.gain.value;
+  const ecrire = v => { v = Math.max(0,Math.min(1,v)); if(mode==="mp3" && !viaCtx) audio.volume = v; else master.gain.value = v; };
+  function fondu(vers,ms){
+    return new Promise(res=>{
+      clearInterval(volId);
+      const dep = lire(), t0 = performance.now();
+      volId = setInterval(()=>{
+        const k = Math.min(1,(performance.now()-t0)/ms);
+        ecrire(dep+(vers-dep)*k);
+        if(k>=1){ clearInterval(volId); res(); }
+      },50);
+    });
+  }
+
   return {
     async play(){
       try{
-        if(mode==="mp3"){ await audio.play(); }
-        else if(mode==="synth"){ await ctx.resume(); }
+        if(mode==="mp3"){
+          if(viaCtx) await ctx.resume(); else audio.volume = 0;
+          await audio.play();
+        }
+        else if(mode==="synth"){ master.gain.value = 0; await ctx.resume(); }
         else {
-          try{ audio=new Audio("gymnopedie.mp3"); audio.loop=true; audio.volume=.9; await audio.play(); mode="mp3"; }
-          catch(e){ audio=null; init(); mode="synth"; }
+          try{
+            audio = new Audio("gymnopedie.mp3"); audio.loop = true;
+            lier();
+            if(viaCtx) await ctx.resume(); else audio.volume = 0;
+            mode = "mp3";
+            await audio.play();
+          }
+          catch(e){
+            if(ctx){ try{ ctx.close(); }catch(_){} ctx = null; }
+            audio = null; viaCtx = false;
+            init(); mode = "synth";
+          }
         }
         joue = true;
+        fondu(vmax(),FADE_IN);
       }catch(e){ joue=false; }
       return joue;
     },
-    async pause(){
-      if(mode==="mp3") audio.pause(); else if(ctx) await ctx.suspend();
-      joue = false; return joue;
+    async pause(vite){
+      joue = false;
+      if(!vite) await fondu(0,FADE_OUT);
+      if(mode==="mp3"){ audio.pause(); if(viaCtx) await ctx.suspend(); }
+      else if(ctx) await ctx.suspend();
+      return joue;
     },
     get joue(){ return joue; }
   };
@@ -322,11 +370,11 @@ $("#ouvrir").onclick = async()=>{
   const h = parseInt(location.hash.slice(1),10);
   if(h>=1 && h<=POEMES.length) setTimeout(()=>ouvrirLivre(h-1),900);
 };
-document.addEventListener("visibilitychange",()=>{ if(document.hidden && Musique.joue){ Musique.pause().then(majSon); } });
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && Musique.joue){ Musique.pause(true).then(majSon); } });
 
 /* ---------- Lucioles & étoiles ---------- */
 const cv = $("#fx"), c = cv.getContext("2d");
-let W,H,DPR, mx=-999,my=-999, bugs=[], stars=[];
+let W,H,DPR, mx=-999,my=-999, bugs=[], stars=[], filantes=[], prochaine=3500, doigt=false, halo=0;
 const calme = matchMedia("(prefers-reduced-motion:reduce)").matches;
 function taille(){
   DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
@@ -337,8 +385,23 @@ function taille(){
     col:Math.random()<.7?"255,217,138":"240,169,184"}));
 }
 addEventListener("resize",taille); taille();
-addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});
-addEventListener("pointerleave",()=>{mx=my=-999});
+/* Souris : les lucioles fuient le curseur */
+addEventListener("pointermove",e=>{ if(e.pointerType==="mouse"){ doigt=false; mx=e.clientX; my=e.clientY; } });
+addEventListener("pointerleave",()=>{ if(!doigt) mx=my=-999; });
+/* Doigt : les lucioles viennent tourner autour, puis s'envolent quand on lâche */
+function toucher(e){ const t=e.touches[0]; if(!t) return; doigt=true; mx=t.clientX; my=t.clientY; }
+function lacher(){
+  if(!doigt) return;
+  for(const b of bugs){
+    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy)+.001;
+    if(d<320){ const f=(1-d/320)*3.2; b.vx+=dx/d*f+(Math.random()-.5); b.vy+=dy/d*f+(Math.random()-.5); }
+  }
+  doigt=false; mx=my=-999;
+}
+addEventListener("touchstart",toucher,{passive:true});
+addEventListener("touchmove",toucher,{passive:true});
+addEventListener("touchend",lacher,{passive:true});
+addEventListener("touchcancel",lacher,{passive:true});
 function boucle(t){
   c.clearRect(0,0,W,H);
   for(const s of stars){
@@ -348,14 +411,47 @@ function boucle(t){
   for(const b of bugs){
     b.a += (Math.random()-.5)*.25;
     b.vx += Math.cos(b.a)*.012; b.vy += Math.sin(b.a)*.012-.002;
-    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy);
-    if(d<140){ b.vx+=dx/d*.05; b.vy+=dy/d*.05; }
+    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy)+.001;
+    if(doigt){
+      if(d<280){
+        const f = .4+(1-d/280);
+        b.vx += (-dx/d*.09 - dy/d*.05)*f;   /* attirées + petit tourbillon */
+        b.vy += (-dy/d*.09 + dx/d*.05)*f;
+        if(d<50){ b.vx+=dx/d*.12; b.vy+=dy/d*.12; }   /* elles orbitent sans s'empiler */
+      }
+    } else if(d<140){ b.vx+=dx/d*.05; b.vy+=dy/d*.05; }
     b.vx*=.97; b.vy*=.97; b.x+=b.vx; b.y+=b.vy;
     if(b.x<-20)b.x=W+20; if(b.x>W+20)b.x=-20; if(b.y<-20)b.y=H+20; if(b.y>H+20)b.y=-20;
-    const l = .35+.65*Math.max(0,Math.sin(t/900+b.p));
+    let l = .35+.65*Math.max(0,Math.sin(t/900+b.p));
+    if(doigt && d<280) l = Math.min(1,l+(1-d/280)*.5);
     const g = c.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*9);
     g.addColorStop(0,"rgba("+b.col+","+(.85*l)+")"); g.addColorStop(1,"rgba("+b.col+",0)");
     c.fillStyle=g; c.beginPath(); c.arc(b.x,b.y,b.r*9,0,6.283); c.fill();
+  }
+  /* Halo sous le doigt */
+  halo += ((doigt?1:0)-halo)*.12;
+  if(halo>.02){
+    const g = c.createRadialGradient(mx>-900?mx:0,my>-900?my:0,0,mx>-900?mx:0,my>-900?my:0,70);
+    g.addColorStop(0,"rgba(255,217,138,"+(.22*halo)+")"); g.addColorStop(1,"rgba(255,217,138,0)");
+    c.fillStyle=g; c.beginPath(); c.arc(mx,my,70,0,6.283); c.fill();
+  }
+  /* Étoiles filantes */
+  if(!calme){
+    if(t>prochaine){
+      filantes.push({x:W*(.35+Math.random()*.65),y:Math.random()*H*.35,vx:-(7+Math.random()*4),vy:3+Math.random()*2.5,a:0});
+      prochaine = t+6000+Math.random()*8000;
+    }
+    for(let k=filantes.length-1;k>=0;k--){
+      const f = filantes[k];
+      f.x+=f.vx; f.y+=f.vy; f.a+=.013;
+      if(f.a>=1){ filantes.splice(k,1); continue; }
+      const al = Math.sin(Math.PI*f.a), n = Math.hypot(f.vx,f.vy), qx = f.vx/n*140, qy = f.vy/n*140;
+      const g = c.createLinearGradient(f.x,f.y,f.x-qx,f.y-qy);
+      g.addColorStop(0,"rgba(255,250,235,"+al+")"); g.addColorStop(1,"rgba(255,217,138,0)");
+      c.strokeStyle=g; c.lineWidth=1.6; c.lineCap="round";
+      c.beginPath(); c.moveTo(f.x,f.y); c.lineTo(f.x-qx,f.y-qy); c.stroke();
+      c.fillStyle="rgba(255,250,235,"+al+")"; c.beginPath(); c.arc(f.x,f.y,1.8,0,6.283); c.fill();
+    }
   }
   if(!calme) requestAnimationFrame(boucle);
 }
