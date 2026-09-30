@@ -52,6 +52,11 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 .livre.marque span{padding-top:58px}
 .astre{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-style:normal;font-size:1.1rem;line-height:1;color:var(--or);text-shadow:0 0 8px var(--or),0 0 22px rgba(255,217,138,.85);animation:scint 3.2s ease-in-out infinite}
 @keyframes scint{50%{opacity:.55;transform:translateX(-50%) scale(.82)}}
+/* Bandeau « Nouveau » (disparaît une fois le texte ouvert) */
+.neuf-tag{position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%);z-index:2;pointer-events:none;white-space:nowrap;font-style:normal;font-weight:600;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;line-height:1;padding:5px 10px 4px;border-radius:999px;color:var(--nuit);background:linear-gradient(135deg,#ffe7ab,var(--or) 55%,#e6b45a);box-shadow:0 0 14px rgba(255,217,138,.65),0 0 34px rgba(255,217,138,.35);animation:flotteTag 2.6s ease-in-out infinite}
+.neuf-tag::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#e6b45a;border-bottom:0}
+@keyframes flotteTag{50%{transform:translateX(-50%) translateY(-4px)}}
+.rang.a-neuf{margin-top:36px}
 .livre.deco{filter:brightness(.42) saturate(.7);pointer-events:none}
 .livre.deco::before,.livre.deco::after{opacity:.35}
 .vide{flex:none}
@@ -158,6 +163,22 @@ const CATEGORIES = {
 const ORDRE_CAT = ["poesie","slam","citation"];
 const LIVRES = ORDRE_CAT.flatMap(c => POEMES.filter(p => (p.type||"poesie")===c).map(p => Object.assign({}, p, {type:c})));
 
+/* ---------- « Nouveau » : mémorise dans ce navigateur ce qui a déjà été ouvert ---------- */
+const CLE_VUS = "recueil-zoe:vus", vusSession = new Set();
+function lireVus(){ try{ const v = JSON.parse(localStorage.getItem(CLE_VUS)||"[]"); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+function estNeuf(p){ return !!p.nouveau && !vusSession.has(p.titre) && !lireVus().includes(p.titre); }
+function marquerVu(p){
+  if(!p.nouveau) return;
+  vusSession.add(p.titre);
+  try{ const v = lireVus(); if(!v.includes(p.titre)){ v.push(p.titre); localStorage.setItem(CLE_VUS,JSON.stringify(v)); } }catch(e){}
+  document.querySelectorAll(".livre[data-titre]").forEach(l=>{
+    if(l.dataset.titre !== p.titre) return;
+    const t = l.querySelector(".neuf-tag"); if(t) t.remove();
+    const r = l.parentElement; if(r && !r.querySelector(".neuf-tag")) r.classList.remove("a-neuf");
+    l.setAttribute("aria-label", (l.getAttribute("aria-label")||"").replace(" — nouveau",""));
+  });
+}
+
 function construire(){
   const N = Math.max(4, Math.min(11, Math.floor((Math.min(innerWidth,900)-56)/58)));
   etagere.innerHTML = "";
@@ -186,7 +207,13 @@ function construire(){
           const i = LIVRES.indexOf(liste[pos]);
           l.innerHTML = "<span></span>"; l.firstChild.textContent = liste[pos].titre;
           if(liste[pos].etoile){ l.classList.add("marque"); l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>'); }
+          l.dataset.titre = liste[pos].titre;
           l.setAttribute("aria-label","Ouvrir : "+liste[pos].titre+" ("+C.nom+")");
+          if(estNeuf(liste[pos])){
+            l.insertAdjacentHTML("beforeend",'<em class="neuf-tag" aria-hidden="true">Nouveau</em>');
+            l.setAttribute("aria-label",l.getAttribute("aria-label")+" — nouveau");
+            rang.classList.add("a-neuf");
+          }
           l.onclick = ()=>ouvrirAvecCouverture(l,i);
         }
         rang.appendChild(l);
@@ -203,6 +230,7 @@ addEventListener("resize",()=>{ if(Math.abs(innerWidth-largeur)>40){ largeur=inn
 const esc = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
 function rendre(i){
   const p = LIVRES[i];
+  marquerVu(p);
   $("#catnom").textContent = CATEGORIES[p.type].nom;
   let html, n = 0;
   if(p.type==="citation"){
