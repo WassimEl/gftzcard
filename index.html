@@ -88,6 +88,22 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 #points i{width:6px;height:6px;border-radius:50%;background:var(--brume);opacity:.4;transition:all .4s}
 #points i.a{opacity:1;background:var(--or);box-shadow:0 0 10px var(--or);transform:scale(1.5)}
 
+/* Livre qui s'ouvre */
+.couvw{position:fixed;inset:0;z-index:5;pointer-events:none;transition:opacity .6s ease}
+.couvw.fane{opacity:0}
+.couv{position:absolute;transform-origin:left center;transform-style:preserve-3d;transform:perspective(1700px) rotateY(0deg);
+  transition:left .75s cubic-bezier(.3,.7,.2,1),top .75s cubic-bezier(.3,.7,.2,1),width .75s cubic-bezier(.3,.7,.2,1),height .75s cubic-bezier(.3,.7,.2,1),transform 1.15s cubic-bezier(.55,.05,.25,1)}
+.couv.ouvre{transform:perspective(1700px) rotateY(-172deg)}
+.couv .av,.couv .ar{position:absolute;inset:0;border-radius:3px 9px 9px 3px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 18px 50px rgba(0,0,0,.6),0 0 44px rgba(255,217,138,.22)}
+.couv .av{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12%;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),transparent 11%,transparent 88%,rgba(0,0,0,.28)),var(--c)}
+.couv .av::before{content:"";position:absolute;inset:7%;border:1px solid var(--bande);opacity:.45;border-radius:2px}
+.couv .ast{font-style:normal;font-size:1.5rem;line-height:1;color:var(--or);margin-bottom:18px;text-shadow:0 0 8px var(--or),0 0 22px rgba(255,217,138,.85);opacity:0;transition:opacity .5s .4s}
+.couv h4{margin:0;font-weight:500;font-style:italic;font-size:clamp(1.7rem,7vw,2.5rem);line-height:1.2;color:var(--lune);text-shadow:0 0 18px rgba(255,217,138,.35);opacity:0;transition:opacity .5s .4s}
+.couv h4::after{content:"";display:block;width:56px;height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,var(--bande),transparent)}
+.couv.grand .ast,.couv.grand h4{opacity:1}
+.couv .ar{transform:rotateY(180deg);background:linear-gradient(270deg,rgba(0,0,0,.4),transparent 14%),#171a3d;box-shadow:inset 0 0 0 10px #12153a,inset 0 0 0 11px rgba(255,217,138,.35),0 18px 50px rgba(0,0,0,.6)}
+
 /* Musique */
 #son{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;border:1px solid rgba(244,234,214,.4);background:rgba(12,15,36,.55);backdrop-filter:blur(6px);display:none;place-items:center;z-index:6}
 #son.on{display:grid}
@@ -171,7 +187,7 @@ function construire(){
           l.innerHTML = "<span></span>"; l.firstChild.textContent = liste[pos].titre;
           if(liste[pos].etoile){ l.classList.add("marque"); l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>'); }
           l.setAttribute("aria-label","Ouvrir : "+liste[pos].titre+" ("+C.nom+")");
-          l.onclick = ()=>{ l.classList.add("sort"); setTimeout(()=>{ ouvrirLivre(i); l.classList.remove("sort"); },520); };
+          l.onclick = ()=>ouvrirAvecCouverture(l,i);
         }
         rang.appendChild(l);
       }
@@ -218,6 +234,33 @@ function rendre(i){
   try{ history.replaceState(null,"","#"+(i+1)); }catch(e){}
 }
 function ouvrirLivre(i){ cur=i; rendre(i); $("#lecture").classList.add("on"); }
+
+/* Le livre sort de l'étagère, vient au centre, puis sa couverture s'ouvre sur le poème */
+let couvertureEnCours = false;
+function ouvrirAvecCouverture(l,i){
+  if(couvertureEnCours) return;
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches){ ouvrirLivre(i); return; }
+  couvertureEnCours = true;
+  const p = LIVRES[i], r = l.getBoundingClientRect();
+  const w = document.createElement("div"); w.className = "couvw";
+  const v = document.createElement("div"); v.className = "couv";
+  v.style.left = r.left+"px"; v.style.top = r.top+"px"; v.style.width = r.width+"px"; v.style.height = r.height+"px";
+  v.style.setProperty("--bande", l.style.getPropertyValue("--bande"));
+  v.style.setProperty("--c", l.style.backgroundColor);
+  v.innerHTML = '<div class="av"><i class="ast" aria-hidden="true">\u2605</i><h4></h4></div><div class="ar"></div>';
+  v.querySelector("h4").textContent = p.titre;
+  if(!p.etoile) v.querySelector(".ast").remove();
+  w.appendChild(v); document.body.appendChild(w);
+  l.style.visibility = "hidden";
+  void v.offsetWidth;
+  const cw = Math.min(innerWidth*.84,400), ch = Math.min(innerHeight*.74,cw*1.5);
+  v.style.left = (innerWidth-cw)/2+"px"; v.style.top = (innerHeight-ch)/2+"px";
+  v.style.width = cw+"px"; v.style.height = ch+"px";
+  v.classList.add("grand");
+  setTimeout(()=>{ ouvrirLivre(i); v.classList.add("ouvre"); },1150);
+  setTimeout(()=>{ w.classList.add("fane"); },1900);
+  setTimeout(()=>{ w.remove(); l.style.visibility = ""; couvertureEnCours = false; },2600);
+}
 function fermer(){
   $("#lecture").classList.remove("on");
   try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
