@@ -57,6 +57,30 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 .neuf-tag::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#e6b45a;border-bottom:0}
 @keyframes flotteTag{50%{transform:translateX(-50%) translateY(-4px)}}
 .rang.a-neuf{margin-top:36px}
+/* Ciel selon l'heure (aube / jour / soir / nuit) */
+:root[data-ciel="aube"]{--nuit2:#a65f86;--nuit:#2d2350;--voile:rgba(40,26,62,.93)}
+:root[data-ciel="jour"]{--nuit2:#4d84c2;--nuit:#27508a;--voile:rgba(20,44,84,.93);--brume:#e2ecf8}
+:root[data-ciel="soir"]{--nuit2:#7a3f6e;--nuit:#1c1840;--voile:rgba(28,20,54,.93)}
+:root[data-ciel="jour"] .lune{background:radial-gradient(circle at 35% 30%,#fffbe8,#ffe08f 55%,#f3b94e);box-shadow:0 0 70px 14px rgba(255,224,143,.5),0 0 190px 70px rgba(255,255,255,.22)}
+#intro p.dedi{margin-bottom:14px}
+#intro p.salut{font-size:1.1rem;color:var(--brume);margin:0 0 40px;animation-delay:2.6s;text-shadow:none}
+/* Étoile cachée */
+#astre-secret{position:fixed;top:13%;right:15%;width:44px;height:44px;display:grid;place-items:center;font-size:1.05rem;color:var(--or);text-shadow:0 0 10px var(--or),0 0 26px rgba(255,217,138,.9);animation:scint2 3.6s ease-in-out infinite}
+#astre-secret[hidden]{display:none}
+@keyframes scint2{50%{opacity:.5;transform:scale(.8)}}
+#secret{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:32px;text-align:center;background:rgba(6,8,22,.6);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .9s,visibility .9s;cursor:pointer}
+#secret.on{opacity:1;visibility:visible}
+#secret p{margin:0;max-width:16em;white-space:pre-line;font-style:italic;font-weight:300;font-size:clamp(1.6rem,6vw,2.3rem);line-height:1.35;color:var(--or);text-shadow:0 0 26px rgba(255,217,138,.55)}
+.etin{position:fixed;width:5px;height:5px;border-radius:50%;background:var(--or);box-shadow:0 0 8px var(--or);pointer-events:none;z-index:5;animation:etin .9s ease-out forwards}
+@keyframes etin{from{opacity:1;transform:translate(0,0)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+/* Préférés */
+.droite{display:flex;align-items:center;gap:14px}
+#coeur{font-size:1.5rem;line-height:1;padding:4px 6px;color:var(--brume);font-style:normal;transition:color .3s,transform .3s}
+#coeur:hover{transform:scale(1.2)}
+#coeur.on{color:var(--rose);text-shadow:0 0 14px rgba(240,169,184,.8)}
+.coeur-dos{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-style:normal;font-size:.95rem;line-height:1;color:var(--rose);text-shadow:0 0 8px rgba(240,169,184,.9);pointer-events:none}
+.coeur-nom{font-style:normal;color:var(--rose);text-shadow:0 0 12px rgba(240,169,184,.7)}
+.livre.marque span,.livre.aime span{padding:54px 0}
 .livre.deco{filter:brightness(.42) saturate(.7);pointer-events:none}
 .livre.deco::before,.livre.deco::after{opacity:.35}
 .vide{flex:none}
@@ -65,7 +89,7 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 .nomcat::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(244,234,214,.35),transparent)}
 
 /* Lecture */
-#lecture{position:fixed;inset:0;display:flex;flex-direction:column;background:rgba(12,15,36,.93);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s;z-index:4}
+#lecture{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--voile,rgba(12,15,36,.93));backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s;z-index:4}
 #lecture.on{opacity:1;visibility:visible}
 .haut{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;color:var(--brume);font-style:italic}
 #retour{padding:8px 4px;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
@@ -126,7 +150,9 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
   <div class="lune"></div>
   <p>Un recueil.</p>
   <p class="dedi">Pour toi Zoé.</p>
+  <p class="salut" id="salut"></p>
   <button id="ouvrir">Entrer</button>
+  <button id="astre-secret" aria-label="Une étoile brille un peu plus que les autres" hidden>✦</button>
 </section>
 
 <main id="biblio">
@@ -135,13 +161,15 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 </main>
 
 <section id="lecture" aria-label="Lecture">
-  <div class="haut"><button id="retour">&#8592; Bibliothèque</button><span id="catnom"></span></div>
+  <div class="haut"><button id="retour">&#8592; Bibliothèque</button><span class="droite"><button id="coeur" aria-pressed="false" aria-label="Ajouter à mes préférés">♡</button><span id="catnom"></span></span></div>
   <div id="scene"><article id="poeme" aria-live="polite"></article></div>
   <div class="bas">
     <div class="fleches"><button id="prec" aria-label="Poème précédent">&#8592;</button><button id="suiv" aria-label="Poème suivant">&#8594;</button></div>
     <div id="points"></div>
   </div>
 </section>
+
+<div id="secret" role="dialog" aria-live="polite"><p></p></div>
 
 <button id="son" aria-label="Mettre la musique en pause"></button>
 
@@ -151,6 +179,54 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 const $ = s => document.querySelector(s);
 const poeme = $("#poeme"), points = $("#points"), etagere = $("#etagere");
 let cur = 0;
+/* ---------- Ciel selon l'heure ---------- */
+const SALUTS = Object.assign({aube:"Bon matin, Zoé",jour:"Bonjour Zoé",soir:"Bonsoir Zoé",nuit:"Bonne nuit, Zoé"}, REGLAGES.salutations||{});
+const CIEL_ETOILES = {aube:.55, jour:.08, soir:.6, nuit:1}, THEME = {aube:"#2d2350", jour:"#27508a", soir:"#1c1840", nuit:"#0c0f24"};
+let ciel = "nuit";
+function majCiel(){
+  const h = new Date().getHours();
+  ciel = h>=5&&h<8 ? "aube" : h>=8&&h<18 ? "jour" : h>=18&&h<21 ? "soir" : "nuit";
+  document.documentElement.dataset.ciel = ciel;
+  $("#salut").textContent = SALUTS[ciel];
+  document.querySelector('meta[name="theme-color"]').content = THEME[ciel];
+}
+majCiel(); setInterval(majCiel,600000);
+
+/* ---------- Préférés (gardés dans le navigateur) ---------- */
+const CLE_FAV = "recueil-zoe:favoris";
+let favoris = new Set();
+try{ const v = JSON.parse(localStorage.getItem(CLE_FAV)||"[]"); if(Array.isArray(v)) favoris = new Set(v); }catch(e){}
+const estAime = p => favoris.has(p.titre);
+function majCoeur(i){
+  const on = estAime(LIVRES[i]), b = $("#coeur");
+  b.classList.toggle("on",on); b.textContent = on ? "♥" : "♡"; b.setAttribute("aria-pressed",on);
+  b.setAttribute("aria-label", on ? "Retirer de mes préférés" : "Ajouter à mes préférés");
+}
+$("#coeur").onclick = ()=>{
+  const p = LIVRES[cur];
+  if(favoris.has(p.titre)) favoris.delete(p.titre); else favoris.add(p.titre);
+  try{ localStorage.setItem(CLE_FAV,JSON.stringify([...favoris])); }catch(e){}
+  majCoeur(cur); construire();
+};
+
+/* ---------- Étoile cachée : un mot secret ---------- */
+const motSecret = (REGLAGES.motSecret||"").trim(), astreSecret = $("#astre-secret"), secret = $("#secret");
+if(motSecret){
+  astreSecret.hidden = false; secret.querySelector("p").textContent = motSecret;
+  astreSecret.onclick = ()=>{
+    const r = astreSecret.getBoundingClientRect(), x = r.left+r.width/2, y = r.top+r.height/2;
+    for(let k=0;k<14;k++){
+      const e = document.createElement("i"), a = Math.random()*6.283, d = 30+Math.random()*60;
+      e.className = "etin"; e.style.cssText = "left:"+x+"px;top:"+y+"px;--dx:"+Math.cos(a)*d+"px;--dy:"+Math.sin(a)*d+"px";
+      document.body.appendChild(e); setTimeout(()=>e.remove(),1000);
+    }
+    secret.classList.add("on");
+  };
+  secret.onclick = ()=>secret.classList.remove("on");
+  addEventListener("keydown",e=>{ if(e.key==="Escape") secret.classList.remove("on"); });
+}
+
+
 const COULEURS = ["#5b1a2b","#1f3d33","#20305a","#6a4a1c","#3b2a55","#4a2a1f","#24474f"];
 const alea = n => { const x = Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); };
 
@@ -183,6 +259,26 @@ function construire(){
   const N = Math.max(4, Math.min(11, Math.floor((Math.min(innerWidth,900)-56)/58)));
   etagere.innerHTML = "";
   let gk = 0;
+  const aimes = LIVRES.map((p,i)=>({p,i})).filter(o=>estAime(o.p));
+  if(aimes.length){
+    const bloc = document.createElement("section"); bloc.className = "etage";
+    const t = document.createElement("h3"); t.className = "nomcat"; t.innerHTML = '<em class="coeur-nom">♥</em> Ceux que j\'aime'; bloc.appendChild(t);
+    for(let r=0;r<Math.ceil(aimes.length/N);r++){
+      const rang = document.createElement("div"); rang.className = "rang";
+      aimes.slice(r*N,(r+1)*N).forEach((o,k)=>{
+        const C = CATEGORIES[o.p.type], l = document.createElement("button");
+        l.className = "livre vrai"+(o.p.etoile?" marque":"");
+        l.style.setProperty("--bande",C.bande); l.style.width = C.l[k%3]+"px"; l.style.height = (C.h+(k%3)*6)+"px"; l.style.backgroundColor = C.couleurs[k%3];
+        l.innerHTML = "<span></span>"; l.firstChild.textContent = o.p.titre;
+        if(o.p.etoile) l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>');
+        l.setAttribute("aria-label","Ouvrir : "+o.p.titre+" (préféré)");
+        l.onclick = ()=>ouvrirAvecCouverture(l,o.i);
+        rang.appendChild(l);
+      });
+      bloc.appendChild(rang);
+    }
+    etagere.appendChild(bloc);
+  }
   ORDRE_CAT.forEach(cat=>{
     const C = CATEGORIES[cat], liste = LIVRES.filter(p=>p.type===cat);
     if(!liste.length) return;
@@ -208,6 +304,7 @@ function construire(){
           l.innerHTML = "<span></span>"; l.firstChild.textContent = liste[pos].titre;
           if(liste[pos].etoile){ l.classList.add("marque"); l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>'); }
           l.dataset.titre = liste[pos].titre;
+          if(estAime(liste[pos])){ l.classList.add("aime"); l.insertAdjacentHTML("beforeend",'<em class="coeur-dos" aria-hidden="true">♥</em>'); }
           l.setAttribute("aria-label","Ouvrir : "+liste[pos].titre+" ("+C.nom+")");
           if(estNeuf(liste[pos])){
             l.insertAdjacentHTML("beforeend",'<em class="neuf-tag" aria-hidden="true">Nouveau</em>');
@@ -230,7 +327,7 @@ addEventListener("resize",()=>{ if(Math.abs(innerWidth-largeur)>40){ largeur=inn
 const esc = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
 function rendre(i){
   const p = LIVRES[i];
-  marquerVu(p);
+  marquerVu(p); majCoeur(i);
   $("#catnom").textContent = CATEGORIES[p.type].nom;
   let html, n = 0;
   if(p.type==="citation"){
@@ -476,7 +573,7 @@ addEventListener("touchcancel",lacher,{passive:true});
 function boucle(t){
   c.clearRect(0,0,W,H);
   for(const s of stars){
-    c.fillStyle="rgba(244,234,214,"+(.25+.35*Math.sin(t/1300+s.p))+")";
+    c.fillStyle="rgba(244,234,214,"+(.25+.35*Math.sin(t/1300+s.p))*CIEL_ETOILES[ciel]+")";
     c.beginPath(); c.arc(s.x,s.y,s.r,0,6.283); c.fill();
   }
   for(const b of bugs){
@@ -509,7 +606,7 @@ function boucle(t){
   /* Étoiles filantes */
   if(!calme){
     if(t>prochaine){
-      filantes.push({x:W*(.35+Math.random()*.65),y:Math.random()*H*.35,vx:-(7+Math.random()*4),vy:3+Math.random()*2.5,a:0});
+      if(ciel!=="jour") filantes.push({x:W*(.35+Math.random()*.65),y:Math.random()*H*.35,vx:-(7+Math.random()*4),vy:3+Math.random()*2.5,a:0});
       prochaine = t+6000+Math.random()*8000;
     }
     for(let k=filantes.length-1;k>=0;k--){
