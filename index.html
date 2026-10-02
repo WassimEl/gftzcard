@@ -25,7 +25,9 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 /* Intro */
 #intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity 1.2s ease,visibility 1.2s;z-index:3}
 #intro.gone{opacity:0;visibility:hidden}
-.lune{width:min(46vw,190px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffaf0,var(--lune) 55%,#d9c9a6);box-shadow:0 0 60px 10px rgba(255,217,138,.35),0 0 180px 60px rgba(240,169,184,.18);animation:flotte 7s ease-in-out infinite;margin-bottom:48px}
+.lune{position:relative;width:min(46vw,190px);aspect-ratio:1;margin-bottom:48px;animation:flotte 7s ease-in-out infinite;will-change:transform}
+.lune::before{content:"";position:absolute;inset:-70%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,217,138,.34) 0%,rgba(255,217,138,.16) 26%,rgba(240,169,184,.07) 44%,transparent 64%)}
+.lune::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 62% 38%,rgba(150,130,100,.24) 0 8%,transparent 9%),radial-gradient(circle at 36% 62%,rgba(150,130,100,.2) 0 11%,transparent 12%),radial-gradient(circle at 70% 72%,rgba(150,130,100,.16) 0 5%,transparent 6%),radial-gradient(circle at 35% 30%,#fffaf0,var(--lune) 55%,#d9c9a6);box-shadow:inset -14px -10px 26px rgba(120,100,70,.3)}
 @keyframes flotte{50%{transform:translateY(-14px)}}
 #intro p{color:var(--lune);font-size:clamp(1.6rem,6vw,2.2rem);font-style:italic;font-weight:300;margin:0 0 12px;animation:souffle .9s ease-out both;text-shadow:0 0 26px rgba(255,217,138,.4)}
 #intro p.dedi{color:var(--rose);font-size:clamp(1.35rem,5vw,1.8rem);margin-bottom:40px;animation-delay:.45s;text-shadow:0 0 26px rgba(240,169,184,.5)}
@@ -61,9 +63,11 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radiu
 :root[data-ciel="aube"]{--nuit2:#a65f86;--nuit:#2d2350;--voile:rgba(40,26,62,.93)}
 :root[data-ciel="jour"]{--nuit2:#4d84c2;--nuit:#27508a;--voile:rgba(20,44,84,.93);--brume:#e2ecf8}
 :root[data-ciel="soir"]{--nuit2:#7a3f6e;--nuit:#1c1840;--voile:rgba(28,20,54,.93)}
-:root[data-ciel="jour"] .lune{background:radial-gradient(circle at 35% 30%,#fffbe8,#ffe08f 55%,#f3b94e);box-shadow:0 0 70px 14px rgba(255,224,143,.5),0 0 190px 70px rgba(255,255,255,.22)}
+:root[data-ciel="jour"] .lune::before{background:radial-gradient(circle,rgba(255,235,160,.55) 0%,rgba(255,255,255,.2) 30%,transparent 64%)}
+:root[data-ciel="jour"] .lune::after{background:radial-gradient(circle at 35% 30%,#fffbe8,#ffe08f 55%,#f3b94e);box-shadow:none}
 #intro p.dedi{margin-bottom:14px}
 #intro p.salut{font-size:1.1rem;color:var(--brume);margin:0 0 40px;animation-delay:.9s;text-shadow:none}
+#intro p.salut::before,#intro p.salut::after{content:"✦";color:var(--or);font-size:.7em;margin:0 .7em;opacity:.85;vertical-align:.1em}
 /* Étoile cachée */
 #astre-secret{position:fixed;top:13%;right:15%;width:44px;height:44px;display:grid;place-items:center;font-size:.95rem;color:var(--or);text-shadow:0 0 10px var(--or),0 0 26px rgba(255,217,138,.9);animation:scint2 3.6s ease-in-out infinite}
 #astre-secret[hidden]{display:none}
@@ -180,7 +184,7 @@ const $ = s => document.querySelector(s);
 const poeme = $("#poeme"), points = $("#points"), etagere = $("#etagere");
 let cur = 0;
 /* ---------- Ciel selon l'heure ---------- */
-const SALUTS = Object.assign({aube:"Bon matin, Zoé",jour:"Bonjour Zoé",soir:"Bonsoir Zoé",nuit:"Bonne nuit, Zoé"}, REGLAGES.salutations||{});
+const SALUTS = Object.assign({aube:"Le jour se lève, doucement",jour:"Le ciel est clair, prends ton temps",soir:"Le ciel s'adoucit, viens lire",nuit:"Les étoiles t'attendent"}, REGLAGES.salutations||{});
 const CIEL_ETOILES = {aube:.55, jour:.08, soir:.6, nuit:1}, THEME = {aube:"#2d2350", jour:"#27508a", soir:"#1c1840", nuit:"#0c0f24"};
 let ciel = "nuit";
 function majCiel(){
