@@ -223,5 +223,5 @@ const REGLAGES = {
      Vide ("") = pas d'étoile. */
   motSecret: "T'as trouvé un petit secret, t'es trop forte 😊. Gros bisous",
   /* Salutations selon l'heure sur son téléphone : aube 5h-8h, jour 8h-18h, soir 18h-21h, nuit 21h-5h */
-  salutations: { aube: "Bon matin, Zoé", jour: "Bonjour Zoé", soir: "Bonsoir Zoé", nuit: "Bonne nuit, Zoé" }
+  salutations: { aube: "Le jour se lève, doucement", jour: "Le ciel est clair, prends ton temps", soir: "Le ciel s'adoucit, viens lire", nuit: "Les étoiles t'attendent" }
 };
