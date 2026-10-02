@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pour Zoé</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0c0f24">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🌙%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#0c0f24; --nuit2:#1a1740; --lune:#f4ead6; --brume:#a9a3c7; --rose:#f0a9b8; --or:#ffd98a;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  color-scheme:dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;background:radial-gradient(120% 90% at 50% 0%,var(--nuit2),var(--nuit) 65%);color:var(--lune);font-family:var(--serif);overflow:hidden}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radius:8px}
+
+/* Intro */
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity 1.2s ease,visibility 1.2s;z-index:3}
+#intro.gone{opacity:0;visibility:hidden}
+.lune{position:relative;width:min(46vw,190px);aspect-ratio:1;margin-bottom:48px;animation:flotte 7s ease-in-out infinite;will-change:transform}
+.lune::before{content:"";position:absolute;inset:-70%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,217,138,.34) 0%,rgba(255,217,138,.16) 26%,rgba(240,169,184,.07) 44%,transparent 64%)}
+.lune::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 62% 38%,rgba(150,130,100,.24) 0 8%,transparent 9%),radial-gradient(circle at 36% 62%,rgba(150,130,100,.2) 0 11%,transparent 12%),radial-gradient(circle at 70% 72%,rgba(150,130,100,.16) 0 5%,transparent 6%),radial-gradient(circle at 35% 30%,#fffaf0,var(--lune) 55%,#d9c9a6);box-shadow:inset -14px -10px 26px rgba(120,100,70,.3)}
+@keyframes flotte{50%{transform:translateY(-14px)}}
+#intro p{color:var(--lune);font-size:clamp(1.6rem,6vw,2.2rem);font-style:italic;font-weight:300;margin:0 0 12px;animation:souffle .9s ease-out both;text-shadow:0 0 26px rgba(255,217,138,.4)}
+#intro p.dedi{color:var(--rose);font-size:clamp(1.35rem,5vw,1.8rem);margin-bottom:40px;animation-delay:.45s;text-shadow:0 0 26px rgba(240,169,184,.5)}
+@keyframes souffle{from{opacity:0;filter:blur(12px);letter-spacing:.25em}to{opacity:1;filter:blur(0);letter-spacing:.02em}}
+#ouvrir{border:1px solid var(--or);border-radius:999px;padding:12px 34px;font-size:1.2rem;color:var(--or);transition:background .3s,color .3s,box-shadow .3s}
+#ouvrir:hover{background:var(--or);color:var(--nuit);box-shadow:0 0 30px rgba(255,217,138,.5)}
+
+/* Bibliothèque */
+#biblio{position:fixed;inset:0;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity 1.4s ease .3s;padding:0 0 90px}
+#biblio.on{opacity:1;visibility:visible}
+#biblio h2{font-weight:300;font-style:italic;text-align:center;color:var(--brume);font-size:1.25rem;margin:30px 0 34px}
+#etagere{max-width:900px;margin:0 auto;padding:0 14px}
+.rang{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:4px;padding:0 14px;margin-bottom:30px;min-height:200px;background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.04));border-radius:4px 4px 0 0}
+.rang::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-14px;height:14px;border-radius:2px;background:linear-gradient(#6a4630,#2c1c12);box-shadow:0 14px 26px rgba(0,0,0,.55)}
+.livre{position:relative;flex:none;display:flex;align-items:center;justify-content:center;border-radius:3px 3px 0 0;
+  background-image:linear-gradient(90deg,rgba(0,0,0,.4),transparent 22%,transparent 78%,rgba(0,0,0,.45));
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.livre::before,.livre::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--bande,var(--or));opacity:.75}
+.livre::before{top:14px}.livre::after{bottom:14px}
+.livre.vrai{cursor:pointer;box-shadow:0 0 22px rgba(255,217,138,.22)}
+.livre.vrai:hover,.livre.vrai:focus-visible{transform:translateY(-16px);box-shadow:0 0 34px rgba(255,217,138,.5)}
+.livre.vrai.sort{transform:translateY(-34px) scale(1.06);box-shadow:0 0 50px rgba(255,217,138,.8)}
+.livre.vrai span{writing-mode:vertical-rl;transform:rotate(180deg);font-style:italic;font-size:1.25rem;color:var(--lune);text-shadow:0 0 12px rgba(0,0,0,.6);padding:24px 0}
+.livre.marque span{padding-top:58px}
+.astre{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-style:normal;font-size:1.1rem;line-height:1;color:var(--or);text-shadow:0 0 8px var(--or),0 0 22px rgba(255,217,138,.85);animation:scint 3.2s ease-in-out infinite}
+@keyframes scint{50%{opacity:.55;transform:translateX(-50%) scale(.82)}}
+/* Bandeau « Nouveau » (disparaît une fois le texte ouvert) */
+.neuf-tag{position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%);z-index:2;pointer-events:none;white-space:nowrap;font-style:normal;font-weight:600;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;line-height:1;padding:5px 10px 4px;border-radius:999px;color:var(--nuit);background:linear-gradient(135deg,#ffe7ab,var(--or) 55%,#e6b45a);box-shadow:0 0 14px rgba(255,217,138,.65),0 0 34px rgba(255,217,138,.35);animation:flotteTag 2.6s ease-in-out infinite}
+.neuf-tag::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#e6b45a;border-bottom:0}
+@keyframes flotteTag{50%{transform:translateX(-50%) translateY(-4px)}}
+.rang.a-neuf{margin-top:36px}
+/* Ciel selon l'heure (aube / jour / soir / nuit) */
+:root[data-ciel="aube"]{--nuit2:#a65f86;--nuit:#2d2350;--voile:rgba(40,26,62,.93)}
+:root[data-ciel="jour"]{--nuit2:#4d84c2;--nuit:#27508a;--voile:rgba(20,44,84,.93);--brume:#e2ecf8}
+:root[data-ciel="soir"]{--nuit2:#7a3f6e;--nuit:#1c1840;--voile:rgba(28,20,54,.93)}
+:root[data-ciel="jour"] .lune::before{background:radial-gradient(circle,rgba(255,235,160,.55) 0%,rgba(255,255,255,.2) 30%,transparent 64%)}
+:root[data-ciel="jour"] .lune::after{background:radial-gradient(circle at 35% 30%,#fffbe8,#ffe08f 55%,#f3b94e);box-shadow:none}
+#intro p.dedi{margin-bottom:14px}
+#intro p.salut{font-size:1.1rem;color:var(--brume);margin:0 0 40px;animation-delay:.9s;text-shadow:none}
+#intro p.salut::before,#intro p.salut::after{content:"✦";color:var(--or);font-size:.7em;margin:0 .7em;opacity:.85;vertical-align:.1em}
+/* Étoile cachée */
+#astre-secret{position:fixed;top:13%;right:15%;width:44px;height:44px;display:grid;place-items:center;font-size:.95rem;color:var(--or);text-shadow:0 0 10px var(--or),0 0 26px rgba(255,217,138,.9);animation:scint2 3.6s ease-in-out infinite}
+#astre-secret[hidden]{display:none}
+@keyframes scint2{50%{opacity:.5;transform:scale(.8)}}
+#secret{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:32px;text-align:center;background:rgba(6,8,22,.6);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .9s,visibility .9s;cursor:pointer}
+#secret.on{opacity:1;visibility:visible}
+#secret p{margin:0;max-width:16em;white-space:pre-line;font-style:italic;font-weight:300;font-size:clamp(1.6rem,6vw,2.3rem);line-height:1.35;color:var(--or);text-shadow:0 0 26px rgba(255,217,138,.55)}
+.etin{position:fixed;width:5px;height:5px;border-radius:50%;background:var(--or);box-shadow:0 0 8px var(--or);pointer-events:none;z-index:5;animation:etin .9s ease-out forwards}
+@keyframes etin{from{opacity:1;transform:translate(0,0)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+/* Préférés */
+.droite{display:flex;align-items:center;gap:14px}
+#coeur{font-size:1.5rem;line-height:1;padding:4px 6px;color:var(--brume);font-style:normal;transition:color .3s,transform .3s}
+#coeur:hover{transform:scale(1.2)}
+#coeur.on{color:var(--rose);text-shadow:0 0 14px rgba(240,169,184,.8)}
+.coeur-dos{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-style:normal;font-size:.95rem;line-height:1;color:var(--rose);text-shadow:0 0 8px rgba(240,169,184,.9);pointer-events:none}
+.coeur-nom{font-style:normal;color:var(--rose);text-shadow:0 0 12px rgba(240,169,184,.7)}
+.livre.marque span,.livre.aime span{padding:54px 0}
+.livre.deco{filter:brightness(.42) saturate(.7);pointer-events:none}
+.livre.deco::before,.livre.deco::after{opacity:.35}
+.vide{flex:none}
+.etage{margin-bottom:26px}
+.nomcat{display:flex;align-items:center;gap:14px;margin:10px 0 20px 14px;font-weight:300;font-style:italic;font-size:1.7rem;color:var(--lune)}
+.nomcat::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(244,234,214,.35),transparent)}
+
+/* Lecture */
+#lecture{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--voile,rgba(12,15,36,.93));backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s;z-index:4}
+#lecture.on{opacity:1;visibility:visible}
+.haut{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;color:var(--brume);font-style:italic}
+#retour{padding:8px 4px;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
+#retour:hover{border-color:var(--rose);color:var(--rose)}
+#scene{flex:1;overflow-y:auto;display:flex;padding:0 24px}
+#poeme{margin:auto;max-width:34rem;width:100%;padding:24px 0;text-align:center;transition:opacity .35s}
+#poeme.out{opacity:0}
+#poeme h3{font-weight:500;font-style:italic;font-size:clamp(2rem,7vw,3.2rem);margin:0 0 6px;text-shadow:0 0 24px rgba(240,169,184,.4)}
+#poeme .date{color:var(--brume);font-size:1rem;margin-bottom:28px}
+.fleur{display:block;width:70px;height:1px;margin:0 auto 30px;background:linear-gradient(90deg,transparent,var(--rose),transparent)}
+.vers{display:block;font-size:clamp(1.2rem,4.5vw,1.55rem);line-height:1.7;font-weight:300;opacity:0;filter:blur(9px);transform:translateY(8px);animation:encre 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+.vers.blanc{height:1.3rem}
+.citation{margin:0;font-size:clamp(1.55rem,5.6vw,2.3rem);line-height:1.5;font-style:italic;font-weight:300}
+.mot{display:inline-block;margin-right:.05em;opacity:0;filter:blur(9px);transform:translateY(8px);animation:encre 1.3s cubic-bezier(.2,.7,.2,1) forwards}
+.vers.source{font-size:1.05rem;color:var(--brume);font-style:italic;font-weight:300;margin-top:4px}
+.vers.signe{margin-top:30px;font-size:clamp(1.5rem,5vw,1.9rem);font-style:italic;font-weight:500;color:var(--rose);text-shadow:0 0 20px rgba(240,169,184,.55)}
+.vers b{font-weight:500;font-style:italic;color:var(--or);text-shadow:0 0 18px rgba(255,217,138,.7)}
+@keyframes encre{to{opacity:1;filter:blur(0);transform:none}}
+.bas{display:flex;flex-direction:column;align-items:center;gap:14px;padding:12px 24px 26px}
+.fleches{display:flex;gap:34px}
+.fleches button{font-size:2rem;color:var(--brume);padding:4px 14px;transition:color .3s,transform .3s}
+.fleches button:hover:not(:disabled){color:var(--or);transform:scale(1.15)}
+.fleches button:disabled{opacity:.2;cursor:default}
+#points{display:flex;gap:9px}
+#points i{width:6px;height:6px;border-radius:50%;background:var(--brume);opacity:.4;transition:all .4s}
+#points i.a{opacity:1;background:var(--or);box-shadow:0 0 10px var(--or);transform:scale(1.5)}
+
+/* Livre qui s'ouvre */
+.couvw{position:fixed;inset:0;z-index:5;pointer-events:none;transition:opacity .6s ease}
+.couvw.fane{opacity:0}
+.couv{position:absolute;transform-origin:left center;transform-style:preserve-3d;transform:perspective(1700px) rotateY(0deg);
+  transition:left .75s cubic-bezier(.3,.7,.2,1),top .75s cubic-bezier(.3,.7,.2,1),width .75s cubic-bezier(.3,.7,.2,1),height .75s cubic-bezier(.3,.7,.2,1),transform 1.15s cubic-bezier(.55,.05,.25,1)}
+.couv.ouvre{transform:perspective(1700px) rotateY(-172deg)}
+.couv .av,.couv .ar{position:absolute;inset:0;border-radius:3px 9px 9px 3px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 18px 50px rgba(0,0,0,.6),0 0 44px rgba(255,217,138,.22)}
+.couv .av{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12%;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),transparent 11%,transparent 88%,rgba(0,0,0,.28)),var(--c)}
+.couv .av::before{content:"";position:absolute;inset:7%;border:1px solid var(--bande);opacity:.45;border-radius:2px}
+.couv .ast{font-style:normal;font-size:1.5rem;line-height:1;color:var(--or);margin-bottom:18px;text-shadow:0 0 8px var(--or),0 0 22px rgba(255,217,138,.85);opacity:0;transition:opacity .5s .4s}
+.couv h4{margin:0;font-weight:500;font-style:italic;font-size:clamp(1.7rem,7vw,2.5rem);line-height:1.2;color:var(--lune);text-shadow:0 0 18px rgba(255,217,138,.35);opacity:0;transition:opacity .5s .4s}
+.couv h4::after{content:"";display:block;width:56px;height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,var(--bande),transparent)}
+.couv.grand .ast,.couv.grand h4{opacity:1}
+.couv .ar{transform:rotateY(180deg);background:linear-gradient(270deg,rgba(0,0,0,.4),transparent 14%),#171a3d;box-shadow:inset 0 0 0 10px #12153a,inset 0 0 0 11px rgba(255,217,138,.35),0 18px 50px rgba(0,0,0,.6)}
+
+/* Musique */
+#son{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;border:1px solid rgba(244,234,214,.4);background:rgba(12,15,36,.55);backdrop-filter:blur(6px);display:none;place-items:center;z-index:6}
+#son.on{display:grid}
+#son svg{width:20px;height:20px;fill:var(--lune)}
+#son.joue::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--or);animation:onde 3.2s ease-out infinite}
+@keyframes onde{from{transform:scale(1);opacity:.8}to{transform:scale(1.9);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<section id="intro">
+  <div class="lune"></div>
+  <p>Un recueil.</p>
+  <p class="dedi">Pour toi Zoé.</p>
+  <p class="salut" id="salut"></p>
+  <button id="ouvrir">Entrer</button>
+  <button id="astre-secret" aria-label="Une étoile brille un peu plus que les autres" hidden>✦</button>
+</section>
+
+<main id="biblio">
+  <h2>Pour Zoé</h2>
+  <div id="etagere"></div>
+</main>
+
+<section id="lecture" aria-label="Lecture">
+  <div class="haut"><button id="retour">&#8592; Bibliothèque</button><span class="droite"><button id="coeur" aria-pressed="false" aria-label="Ajouter à mes préférés">♡</button><span id="catnom"></span></span></div>
+  <div id="scene"><article id="poeme" aria-live="polite"></article></div>
+  <div class="bas">
+    <div class="fleches"><button id="prec" aria-label="Poème précédent">&#8592;</button><button id="suiv" aria-label="Poème suivant">&#8594;</button></div>
+    <div id="points"></div>
+  </div>
+</section>
+
+<div id="secret" role="dialog" aria-live="polite"><p></p></div>
+
+<button id="son" aria-label="Mettre la musique en pause"></button>
+
+<script src="poems.js"></script>
+
+<script>
+const $ = s => document.querySelector(s);
+const poeme = $("#poeme"), points = $("#points"), etagere = $("#etagere");
+let cur = 0;
+/* ---------- Ciel selon l'heure ---------- */
+const SALUTS = Object.assign({aube:"Le jour se lève, doucement",jour:"Le ciel est clair, prends ton temps",soir:"Le ciel s'adoucit, viens lire",nuit:"Les étoiles t'attendent"}, REGLAGES.salutations||{});
+const CIEL_ETOILES = {aube:.55, jour:.08, soir:.6, nuit:1}, THEME = {aube:"#2d2350", jour:"#27508a", soir:"#1c1840", nuit:"#0c0f24"};
+let ciel = "nuit";
+function majCiel(){
+  const h = new Date().getHours();
+  ciel = h>=5&&h<8 ? "aube" : h>=8&&h<18 ? "jour" : h>=18&&h<21 ? "soir" : "nuit";
+  document.documentElement.dataset.ciel = ciel;
+  $("#salut").textContent = SALUTS[ciel];
+  document.querySelector('meta[name="theme-color"]').content = THEME[ciel];
+}
+majCiel(); setInterval(majCiel,600000);
+
+/* ---------- Préférés (gardés dans le navigateur) ---------- */
+const CLE_FAV = "recueil-zoe:favoris";
+let favoris = new Set();
+try{ const v = JSON.parse(localStorage.getItem(CLE_FAV)||"[]"); if(Array.isArray(v)) favoris = new Set(v); }catch(e){}
+const estAime = p => favoris.has(p.titre);
+function majCoeur(i){
+  const on = estAime(LIVRES[i]), b = $("#coeur");
+  b.classList.toggle("on",on); b.textContent = on ? "♥" : "♡"; b.setAttribute("aria-pressed",on);
+  b.setAttribute("aria-label", on ? "Retirer de mes préférés" : "Ajouter à mes préférés");
+}
+$("#coeur").onclick = ()=>{
+  const p = LIVRES[cur];
+  if(favoris.has(p.titre)) favoris.delete(p.titre); else favoris.add(p.titre);
+  try{ localStorage.setItem(CLE_FAV,JSON.stringify([...favoris])); }catch(e){}
+  majCoeur(cur); construire();
+};
+
+/* ---------- Étoile cachée : un mot secret ---------- */
+const motSecret = (REGLAGES.motSecret||"").trim(), astreSecret = $("#astre-secret"), secret = $("#secret");
+if(motSecret){
+  astreSecret.hidden = false; secret.querySelector("p").textContent = motSecret;
+  astreSecret.onclick = ()=>{
+    const r = astreSecret.getBoundingClientRect(), x = r.left+r.width/2, y = r.top+r.height/2;
+    for(let k=0;k<14;k++){
+      const e = document.createElement("i"), a = Math.random()*6.283, d = 30+Math.random()*60;
+      e.className = "etin"; e.style.cssText = "left:"+x+"px;top:"+y+"px;--dx:"+Math.cos(a)*d+"px;--dy:"+Math.sin(a)*d+"px";
+      document.body.appendChild(e); setTimeout(()=>e.remove(),1000);
+    }
+    secret.classList.add("on");
+  };
+  secret.onclick = ()=>secret.classList.remove("on");
+  addEventListener("keydown",e=>{ if(e.key==="Escape") secret.classList.remove("on"); });
+}
+
+
+const COULEURS = ["#5b1a2b","#1f3d33","#20305a","#6a4a1c","#3b2a55","#4a2a1f","#24474f"];
+const alea = n => { const x = Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+
+/* ---------- Bibliothèque ---------- */
+const CATEGORIES = {
+  poesie:   { nom:"Poésie",    couleurs:["#5b1a2b","#4a2340","#6b2333"], bande:"#ffd98a", h:190, l:[46,53,60] },
+  slam:     { nom:"Slam",      couleurs:["#173a5e","#1c4a55","#14325a"], bande:"#f0a9b8", h:168, l:[58,66,74] },
+  citation: { nom:"Citations", couleurs:["#6a4a1c","#7d5b2a","#5a4426"], bande:"#f4ead6", h:132, l:[34,40,46] }
+};
+const ORDRE_CAT = ["poesie","slam","citation"];
+const LIVRES = ORDRE_CAT.flatMap(c => POEMES.filter(p => (p.type||"poesie")===c).map(p => Object.assign({}, p, {type:c})));
+
+/* ---------- « Nouveau » : mémorise dans ce navigateur ce qui a déjà été ouvert ---------- */
+const CLE_VUS = "recueil-zoe:vus", vusSession = new Set();
+function lireVus(){ try{ const v = JSON.parse(localStorage.getItem(CLE_VUS)||"[]"); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+function estNeuf(p){ return !!p.nouveau && !vusSession.has(p.titre) && !lireVus().includes(p.titre); }
+function marquerVu(p){
+  if(!p.nouveau) return;
+  vusSession.add(p.titre);
+  try{ const v = lireVus(); if(!v.includes(p.titre)){ v.push(p.titre); localStorage.setItem(CLE_VUS,JSON.stringify(v)); } }catch(e){}
+  document.querySelectorAll(".livre[data-titre]").forEach(l=>{
+    if(l.dataset.titre !== p.titre) return;
+    const t = l.querySelector(".neuf-tag"); if(t) t.remove();
+    const r = l.parentElement; if(r && !r.querySelector(".neuf-tag")) r.classList.remove("a-neuf");
+    l.setAttribute("aria-label", (l.getAttribute("aria-label")||"").replace(" — nouveau",""));
+  });
+}
+
+function construire(){
+  const N = Math.max(4, Math.min(11, Math.floor((Math.min(innerWidth,900)-56)/58)));
+  etagere.innerHTML = "";
+  let gk = 0;
+  ORDRE_CAT.forEach(cat=>{
+    const C = CATEGORIES[cat], liste = LIVRES.filter(p=>p.type===cat);
+    if(!liste.length) return;
+    const bloc = document.createElement("section"); bloc.className = "etage";
+    const t = document.createElement("h3"); t.className = "nomcat"; t.textContent = C.nom; bloc.appendChild(t);
+    const rangs = Math.ceil(liste.length/N);
+    for(let r=0;r<rangs;r++){
+      const rang = document.createElement("div"); rang.className = "rang";
+      for(let j=0;j<N;j++,gk++){
+        const pos = r*N+j, vrai = pos < liste.length;
+        if(!vrai && (!REGLAGES.livresDeco || alea(gk+3)<.35)){
+          if(REGLAGES.livresDeco){ const v = document.createElement("i"); v.className="vide"; v.style.width=(18+alea(gk)*16)+"px"; rang.appendChild(v); }
+          continue;
+        }
+        const l = document.createElement(vrai?"button":"div");
+        l.className = "livre "+(vrai?"vrai":"deco");
+        l.style.setProperty("--bande", C.bande);
+        l.style.width = C.l[Math.floor(alea(gk+1)*3)]+"px";
+        l.style.height = (vrai ? C.h+Math.floor(alea(gk+2)*3)*6 : C.h-10-Math.floor(alea(gk+2)*4)*10)+"px";
+        l.style.backgroundColor = C.couleurs[(vrai?pos:pos+1)%3];
+        if(vrai){
+          const i = LIVRES.indexOf(liste[pos]);
+          l.innerHTML = "<span></span>"; l.firstChild.textContent = liste[pos].titre;
+          if(liste[pos].etoile){ l.classList.add("marque"); l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>'); }
+          l.dataset.titre = liste[pos].titre;
+          if(estAime(liste[pos])){ l.classList.add("aime"); l.insertAdjacentHTML("beforeend",'<em class="coeur-dos" aria-hidden="true">♥</em>'); }
+          l.setAttribute("aria-label","Ouvrir : "+liste[pos].titre+" ("+C.nom+")");
+          if(estNeuf(liste[pos])){
+            l.insertAdjacentHTML("beforeend",'<em class="neuf-tag" aria-hidden="true">Nouveau</em>');
+            l.setAttribute("aria-label",l.getAttribute("aria-label")+" — nouveau");
+            rang.classList.add("a-neuf");
+          }
+          l.onclick = ()=>ouvrirAvecCouverture(l,i);
+        }
+        rang.appendChild(l);
+      }
+      bloc.appendChild(rang);
+    }
+    etagere.appendChild(bloc);
+  });
+  const aimes = LIVRES.map((p,i)=>({p,i})).filter(o=>estAime(o.p));
+  if(aimes.length){
+    const bloc = document.createElement("section"); bloc.className = "etage";
+    const t = document.createElement("h3"); t.className = "nomcat"; t.innerHTML = '<em class="coeur-nom">♥</em> Ceux que j\'aime'; bloc.appendChild(t);
+    for(let r=0;r<Math.ceil(aimes.length/N);r++){
+      const rang = document.createElement("div"); rang.className = "rang";
+      aimes.slice(r*N,(r+1)*N).forEach((o,k)=>{
+        const C = CATEGORIES[o.p.type], l = document.createElement("button");
+        l.className = "livre vrai"+(o.p.etoile?" marque":"");
+        l.style.setProperty("--bande",C.bande); l.style.width = C.l[k%3]+"px"; l.style.height = (C.h+(k%3)*6)+"px"; l.style.backgroundColor = C.couleurs[k%3];
+        l.innerHTML = "<span></span>"; l.firstChild.textContent = o.p.titre;
+        if(o.p.etoile) l.insertAdjacentHTML("afterbegin",'<em class="astre" aria-hidden="true">★</em>');
+        l.setAttribute("aria-label","Ouvrir : "+o.p.titre+" (préféré)");
+        l.onclick = ()=>ouvrirAvecCouverture(l,o.i);
+        rang.appendChild(l);
+      });
+      bloc.appendChild(rang);
+    }
+    etagere.appendChild(bloc);
+  }
+}
+let largeur = innerWidth;
+addEventListener("resize",()=>{ if(Math.abs(innerWidth-largeur)>40){ largeur=innerWidth; construire(); } });
+
+/* ---------- Lecture ---------- */
+const esc = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+function rendre(i){
+  const p = LIVRES[i];
+  marquerVu(p); majCoeur(i);
+  $("#catnom").textContent = CATEGORIES[p.type].nom;
+  let html, n = 0;
+  if(p.type==="citation"){
+    const mots = p.texte.trim().split(/\s+/);
+    mots[0] = "«\u00a0"+mots[0]; mots[mots.length-1] += "\u00a0»";
+    const corps = mots.map((m,k)=>'<span class="mot" style="animation-delay:'+(0.8+k*0.07)+'s">'+esc(m)+'</span>').join(" ");
+    const t = 1.3 + mots.length*0.07;
+    html = '<i class="fleur"></i><blockquote class="citation">'+corps+'</blockquote>'
+      + '<span class="vers signe" style="animation-delay:'+t+'s">— '+esc(p.auteur||"Auteur inconnu")+'</span>'
+      + (p.source ? '<span class="vers source" style="animation-delay:'+(t+.4)+'s">'+esc(p.source)+'</span>' : '');
+    poeme.className = "cit";
+  } else {
+    const vers = p.texte.split("\n").map(l => l.trim()
+      ? '<span class="vers" style="animation-delay:'+(0.9+(n++)*0.32)+'s">'+esc(l)+'</span>'
+      : '<span class="vers blanc"></span>').join("");
+    const sig = p.auteur || REGLAGES.signature;
+    html = '<h3></h3>'+(p.date?'<div class="date"></div>':'')+'<i class="fleur"></i>'+vers
+      + (sig ? '<span class="vers signe" style="animation-delay:'+(1.6+n*0.32)+'s">— '+esc(sig)+'</span>' : '');
+    poeme.className = "";
+  }
+  poeme.innerHTML = html;
+  if(p.type!=="citation"){
+    poeme.querySelector("h3").textContent = p.titre;
+    if(p.date) poeme.querySelector(".date").textContent = p.date;
+  }
+  document.querySelectorAll("#points i").forEach((d,k)=>d.classList.toggle("a",k===i));
+  $("#prec").disabled = i===0; $("#suiv").disabled = i===LIVRES.length-1;
+  $("#scene").scrollTop = 0;
+  try{ history.replaceState(null,"","#"+(i+1)); }catch(e){}
+}
+function ouvrirLivre(i){ cur=i; rendre(i); $("#lecture").classList.add("on"); }
+
+/* Le livre sort de l'étagère, vient au centre, puis sa couverture s'ouvre sur le poème */
+let couvertureEnCours = false;
+function ouvrirAvecCouverture(l,i){
+  if(couvertureEnCours) return;
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches){ ouvrirLivre(i); return; }
+  couvertureEnCours = true;
+  const p = LIVRES[i], r = l.getBoundingClientRect();
+  const w = document.createElement("div"); w.className = "couvw";
+  const v = document.createElement("div"); v.className = "couv";
+  v.style.left = r.left+"px"; v.style.top = r.top+"px"; v.style.width = r.width+"px"; v.style.height = r.height+"px";
+  v.style.setProperty("--bande", l.style.getPropertyValue("--bande"));
+  v.style.setProperty("--c", l.style.backgroundColor);
+  v.innerHTML = '<div class="av"><i class="ast" aria-hidden="true">\u2605</i><h4></h4></div><div class="ar"></div>';
+  v.querySelector("h4").textContent = p.titre;
+  if(!p.etoile) v.querySelector(".ast").remove();
+  w.appendChild(v); document.body.appendChild(w);
+  l.style.visibility = "hidden";
+  void v.offsetWidth;
+  const cw = Math.min(innerWidth*.84,400), ch = Math.min(innerHeight*.74,cw*1.5);
+  v.style.left = (innerWidth-cw)/2+"px"; v.style.top = (innerHeight-ch)/2+"px";
+  v.style.width = cw+"px"; v.style.height = ch+"px";
+  v.classList.add("grand");
+  setTimeout(()=>{ ouvrirLivre(i); v.classList.add("ouvre"); },1150);
+  setTimeout(()=>{ w.classList.add("fane"); },1900);
+  setTimeout(()=>{ w.remove(); l.style.visibility = ""; couvertureEnCours = false; },2600);
+}
+function fermer(){
+  $("#lecture").classList.remove("on");
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+}
+function aller(i){
+  if(i<0||i>=LIVRES.length) return;
+  poeme.classList.add("out");
+  setTimeout(()=>{ cur=i; rendre(i); poeme.classList.remove("out"); },350);
+}
+points.innerHTML = LIVRES.map(()=>"<i></i>").join("");
+points.style.display = LIVRES.length>1 ? "flex" : "none";
+$(".fleches").style.display = LIVRES.length>1 ? "flex" : "none";
+$("#prec").onclick = ()=>aller(cur-1);
+$("#suiv").onclick = ()=>aller(cur+1);
+$("#retour").onclick = fermer;
+addEventListener("keydown",e=>{
+  if(!$("#lecture").classList.contains("on")) return;
+  if(e.key==="ArrowRight") aller(cur+1);
+  if(e.key==="ArrowLeft") aller(cur-1);
+  if(e.key==="Escape") fermer();
+});
+let tx=null;
+addEventListener("touchstart",e=>{tx=e.touches[0].clientX},{passive:true});
+addEventListener("touchend",e=>{
+  if(tx===null||!$("#lecture").classList.contains("on")) return;
+  const dx=e.changedTouches[0].clientX-tx; tx=null;
+  if(Math.abs(dx)>60) aller(cur+(dx<0?1:-1));
+},{passive:true});
+
+/* ---------- Musique : Gymnopédie n°1 (Erik Satie, domaine public) ---------- */
+const Musique = (()=>{
+  let ctx, master, timer, nextT=0, bar=0, joue=false;
+  let audio=null, mode=null, viaCtx=false, volId=null;
+  const FADE_IN = 3000, FADE_OUT = 1200;
+  const hz = m => 440*Math.pow(2,(m-69)/12);
+  const B = 0.92;
+  const HARM = [ {bas:43,acc:[59,62,66]}, {bas:43,acc:[59,62,66]}, {bas:38,acc:[57,61,66]}, {bas:38,acc:[57,61,66]} ];
+  const MEL = [ [[78,0,3]], [[81,0,2],[79,2,1]], [[78,0,1],[73,1,1],[71,2,1]], [[73,0,1],[74,1,1],[69,2,1]] ];
+  function note(m,t,d,v){
+    const g = ctx.createGain(), o = ctx.createOscillator(), o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o.type="triangle"; o.frequency.value=hz(m);
+    o2.type="sine"; o2.frequency.value=hz(m)*2; g2.gain.value=.25;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.025);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    o.start(t); o2.start(t); o.stop(t+d+.1); o2.stop(t+d+.1);
+  }
+  function mesure(){
+    const h = HARM[bar%4], t0 = nextT;
+    note(h.bas,t0,B*2.6,.22);
+    h.acc.forEach(m=>{ note(m,t0+B,B*1.9,.07); note(m,t0+2*B,B*1.9,.07); });
+    if(bar>=4) MEL[bar%4].forEach(([m,s,d])=>note(m,t0+s*B,d*B*1.5,.16));
+    nextT += 3*B; bar++;
+  }
+  function init(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value=0;
+    const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
+    const del = ctx.createDelay(); del.delayTime.value=.34;
+    const fb = ctx.createGain(); fb.gain.value=.38;
+    const wet = ctx.createGain(); wet.gain.value=.4;
+    master.connect(lp); lp.connect(ctx.destination);
+    lp.connect(del); del.connect(fb); fb.connect(del); del.connect(wet); wet.connect(ctx.destination);
+    nextT = ctx.currentTime+.2;
+    timer = setInterval(()=>{ while(nextT < ctx.currentTime+3) mesure(); },400);
+  }
+
+  /* mp3 : passe par Web Audio pour que le fondu marche aussi sur iPhone (audio.volume y est ignoré) */
+  function lier(){
+    try{
+      ctx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = ctx.createMediaElementSource(audio);
+      master = ctx.createGain(); master.gain.value=0;
+      src.connect(master); master.connect(ctx.destination);
+      viaCtx = true;
+    }catch(e){ viaCtx = false; }
+  }
+
+  /* Fondu de volume */
+  const vmax = () => mode==="mp3" ? .9 : .85;
+  const lire = () => (mode==="mp3" && !viaCtx) ? audio.volume : master.gain.value;
+  const ecrire = v => { v = Math.max(0,Math.min(1,v)); if(mode==="mp3" && !viaCtx) audio.volume = v; else master.gain.value = v; };
+  function fondu(vers,ms){
+    return new Promise(res=>{
+      clearInterval(volId);
+      const dep = lire(), t0 = performance.now();
+      volId = setInterval(()=>{
+        const k = Math.min(1,(performance.now()-t0)/ms);
+        ecrire(dep+(vers-dep)*k);
+        if(k>=1){ clearInterval(volId); res(); }
+      },50);
+    });
+  }
+
+  return {
+    async play(){
+      try{
+        if(mode==="mp3"){
+          if(viaCtx) await ctx.resume(); else audio.volume = 0;
+          await audio.play();
+        }
+        else if(mode==="synth"){ master.gain.value = 0; await ctx.resume(); }
+        else {
+          try{
+            audio = new Audio("gymnopedie.mp3"); audio.loop = true;
+            lier();
+            if(viaCtx) await ctx.resume(); else audio.volume = 0;
+            mode = "mp3";
+            await audio.play();
+          }
+          catch(e){
+            if(ctx){ try{ ctx.close(); }catch(_){} ctx = null; }
+            audio = null; viaCtx = false;
+            init(); mode = "synth";
+          }
+        }
+        joue = true;
+        fondu(vmax(),FADE_IN);
+      }catch(e){ joue=false; }
+      return joue;
+    },
+    async pause(vite){
+      joue = false;
+      if(!vite) await fondu(0,FADE_OUT);
+      if(mode==="mp3"){ audio.pause(); if(viaCtx) await ctx.suspend(); }
+      else if(ctx) await ctx.suspend();
+      return joue;
+    },
+    get joue(){ return joue; }
+  };
+})();
+
+const son = $("#son");
+const ICON_PAUSE = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
+function majSon(){
+  son.classList.toggle("joue",Musique.joue);
+  son.innerHTML = Musique.joue ? ICON_PAUSE : ICON_PLAY;
+  son.setAttribute("aria-label", Musique.joue ? "Mettre la musique en pause" : "Relancer la musique");
+}
+son.onclick = async()=>{ Musique.joue ? await Musique.pause() : await Musique.play(); majSon(); };
+
+/* ---------- Entrée ---------- */
+$("#ouvrir").onclick = async()=>{
+  await Musique.play();
+  $("#intro").classList.add("gone");
+  construire();
+  $("#biblio").classList.add("on");
+  son.classList.add("on"); majSon();
+  const h = parseInt(location.hash.slice(1),10);
+  if(h>=1 && h<=POEMES.length) setTimeout(()=>ouvrirLivre(h-1),900);
+};
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && Musique.joue){ Musique.pause(true).then(majSon); } });
+
+/* ---------- Lucioles & étoiles ---------- */
+const cv = $("#fx"), c = cv.getContext("2d");
+let W,H,DPR, mx=-999,my=-999, bugs=[], stars=[], filantes=[], prochaine=3500, doigt=false, halo=0;
+const calme = matchMedia("(prefers-reduced-motion:reduce)").matches;
+function taille(){
+  DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  cv.width=W*DPR; cv.height=H*DPR; c.setTransform(DPR,0,0,DPR,0,0);
+  stars = Array.from({length:Math.round(W*H/9000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.2,p:Math.random()*6}));
+  bugs = Array.from({length:calme?12:Math.round(Math.min(70,W*H/16000))},()=>({
+    x:Math.random()*W,y:Math.random()*H,vx:0,vy:0,a:Math.random()*6.28,r:Math.random()*2+1.2,p:Math.random()*6,
+    col:Math.random()<.7?"255,217,138":"240,169,184"}));
+}
+addEventListener("resize",taille); taille();
+/* Souris : les lucioles fuient le curseur */
+addEventListener("pointermove",e=>{ if(e.pointerType==="mouse"){ doigt=false; mx=e.clientX; my=e.clientY; } });
+addEventListener("pointerleave",()=>{ if(!doigt) mx=my=-999; });
+/* Doigt : les lucioles viennent tourner autour, puis s'envolent quand on lâche */
+function toucher(e){ const t=e.touches[0]; if(!t) return; doigt=true; mx=t.clientX; my=t.clientY; }
+function lacher(){
+  if(!doigt) return;
+  for(const b of bugs){
+    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy)+.001;
+    if(d<320){ const f=(1-d/320)*3.2; b.vx+=dx/d*f+(Math.random()-.5); b.vy+=dy/d*f+(Math.random()-.5); }
+  }
+  doigt=false; mx=my=-999;
+}
+addEventListener("touchstart",toucher,{passive:true});
+addEventListener("touchmove",toucher,{passive:true});
+addEventListener("touchend",lacher,{passive:true});
+addEventListener("touchcancel",lacher,{passive:true});
+function boucle(t){
+  c.clearRect(0,0,W,H);
+  for(const s of stars){
+    c.fillStyle="rgba(244,234,214,"+(.25+.35*Math.sin(t/1300+s.p))*CIEL_ETOILES[ciel]+")";
+    c.beginPath(); c.arc(s.x,s.y,s.r,0,6.283); c.fill();
+  }
+  for(const b of bugs){
+    b.a += (Math.random()-.5)*.25;
+    b.vx += Math.cos(b.a)*.012; b.vy += Math.sin(b.a)*.012-.002;
+    const dx=b.x-mx, dy=b.y-my, d=Math.hypot(dx,dy)+.001;
+    if(doigt){
+      if(d<280){
+        const f = .4+(1-d/280);
+        b.vx += (-dx/d*.09 - dy/d*.05)*f;   /* attirées + petit tourbillon */
+        b.vy += (-dy/d*.09 + dx/d*.05)*f;
+        if(d<50){ b.vx+=dx/d*.12; b.vy+=dy/d*.12; }   /* elles orbitent sans s'empiler */
+      }
+    } else if(d<140){ b.vx+=dx/d*.05; b.vy+=dy/d*.05; }
+    b.vx*=.97; b.vy*=.97; b.x+=b.vx; b.y+=b.vy;
+    if(b.x<-20)b.x=W+20; if(b.x>W+20)b.x=-20; if(b.y<-20)b.y=H+20; if(b.y>H+20)b.y=-20;
+    let l = .35+.65*Math.max(0,Math.sin(t/900+b.p));
+    if(doigt && d<280) l = Math.min(1,l+(1-d/280)*.5);
+    const g = c.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*9);
+    g.addColorStop(0,"rgba("+b.col+","+(.85*l)+")"); g.addColorStop(1,"rgba("+b.col+",0)");
+    c.fillStyle=g; c.beginPath(); c.arc(b.x,b.y,b.r*9,0,6.283); c.fill();
+  }
+  /* Halo sous le doigt */
+  halo += ((doigt?1:0)-halo)*.12;
+  if(halo>.02){
+    const g = c.createRadialGradient(mx>-900?mx:0,my>-900?my:0,0,mx>-900?mx:0,my>-900?my:0,70);
+    g.addColorStop(0,"rgba(255,217,138,"+(.22*halo)+")"); g.addColorStop(1,"rgba(255,217,138,0)");
+    c.fillStyle=g; c.beginPath(); c.arc(mx,my,70,0,6.283); c.fill();
+  }
+  /* Étoiles filantes */
+  if(!calme){
+    if(t>prochaine){
+      if(ciel!=="jour") filantes.push({x:W*(.35+Math.random()*.65),y:Math.random()*H*.35,vx:-(7+Math.random()*4),vy:3+Math.random()*2.5,a:0});
+      prochaine = t+6000+Math.random()*8000;
+    }
+    for(let k=filantes.length-1;k>=0;k--){
+      const f = filantes[k];
+      f.x+=f.vx; f.y+=f.vy; f.a+=.013;
+      if(f.a>=1){ filantes.splice(k,1); continue; }
+      const al = Math.sin(Math.PI*f.a), n = Math.hypot(f.vx,f.vy), qx = f.vx/n*140, qy = f.vy/n*140;
+      const g = c.createLinearGradient(f.x,f.y,f.x-qx,f.y-qy);
+      g.addColorStop(0,"rgba(255,250,235,"+al+")"); g.addColorStop(1,"rgba(255,217,138,0)");
+      c.strokeStyle=g; c.lineWidth=1.6; c.lineCap="round";
+      c.beginPath(); c.moveTo(f.x,f.y); c.lineTo(f.x-qx,f.y-qy); c.stroke();
+      c.fillStyle="rgba(255,250,235,"+al+")"; c.beginPath(); c.arc(f.x,f.y,1.8,0,6.283); c.fill();
+    }
+  }
+  if(!calme) requestAnimationFrame(boucle);
+}
+requestAnimationFrame(boucle);
+</script>
+</body>
+</html>
