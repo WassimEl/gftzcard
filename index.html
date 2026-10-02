@@ -214,21 +214,32 @@ $("#coeur").onclick = ()=>{
 };
 
 /* ---------- Étoile cachée : un mot secret ---------- */
-const motSecret = (REGLAGES.motSecret||"").trim(), astreSecret = $("#astre-secret"), secret = $("#secret");
-if(motSecret){
-  astreSecret.hidden = false; secret.querySelector("p").textContent = motSecret;
-  astreSecret.onclick = ()=>{
-    const r = astreSecret.getBoundingClientRect(), x = r.left+r.width/2, y = r.top+r.height/2;
-    for(let k=0;k<14;k++){
-      const e = document.createElement("i"), a = Math.random()*6.283, d = 30+Math.random()*60;
-      e.className = "etin"; e.style.cssText = "left:"+x+"px;top:"+y+"px;--dx:"+Math.cos(a)*d+"px;--dy:"+Math.sin(a)*d+"px";
-      document.body.appendChild(e); setTimeout(()=>e.remove(),1000);
-    }
-    secret.classList.add("on");
-  };
-  secret.onclick = ()=>secret.classList.remove("on");
-  addEventListener("keydown",e=>{ if(e.key==="Escape") secret.classList.remove("on"); });
+const motSecret = (REGLAGES.motSecret||"").trim(), motSecret2 = (REGLAGES.motSecret2||"").trim();
+const astreSecret = $("#astre-secret"), secret = $("#secret");
+function afficherSecret(texte,el){
+  const r = el.getBoundingClientRect(), x = r.left+r.width/2, y = r.top+r.height/2;
+  for(let k=0;k<14;k++){
+    const e = document.createElement("i"), a = Math.random()*6.283, d = 30+Math.random()*60;
+    e.className = "etin"; e.style.cssText = "left:"+x+"px;top:"+y+"px;--dx:"+Math.cos(a)*d+"px;--dy:"+Math.sin(a)*d+"px";
+    document.body.appendChild(e); setTimeout(()=>e.remove(),1000);
+  }
+  secret.querySelector("p").textContent = texte;
+  secret.classList.add("on");
 }
+/* Secret 1 : l'étoile cachée */
+if(motSecret){ astreSecret.hidden = false; astreSecret.onclick = ()=>afficherSecret(motSecret,astreSecret); }
+/* Secret 2 : toucher 3 fois la lune (ou le soleil) */
+if(motSecret2){
+  const lune = document.querySelector(".lune"); let taps = 0, minuteur;
+  lune.style.cursor = "pointer"; lune.style.touchAction = "manipulation"; lune.style.webkitTapHighlightColor = "transparent";
+  lune.addEventListener("click",()=>{
+    taps++; clearTimeout(minuteur);
+    if(taps>=3){ taps = 0; afficherSecret(motSecret2,lune); }
+    else minuteur = setTimeout(()=>{ taps = 0; },1500);
+  });
+}
+secret.onclick = ()=>secret.classList.remove("on");
+addEventListener("keydown",e=>{ if(e.key==="Escape") secret.classList.remove("on"); });
 
 
 const COULEURS = ["#5b1a2b","#1f3d33","#20305a","#6a4a1c","#3b2a55","#4a2a1f","#24474f"];
